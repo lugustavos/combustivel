@@ -3,175 +3,962 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f1f1a">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f2f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1f1a" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Combustível">
+<meta name="description" content="Qual combustível compensa no carro flex, no dia a dia e na devolução de carro alugado.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <title>Combustível</title>
 <style>
-:root{color-scheme:dark;--bg:#0f1f1a;--card:#162a23;--line:#27443a;--text:#f1f8f4;--muted:#9db3a8;--green:#7ee8a8;--amber:#f5cf72;--red:#ff9d8f}
+/* Layout: uma coluna de cartões no celular; preço em cima, resposta grande logo abaixo, ajustes no fim. */
+:root{
+  color-scheme:light;
+  --bg:#f2f5f1; --surface:#ffffff; --well:#eef3ee; --line:#cfdad1; --field-line:#9fb3a5;
+  --text:#12201a; --muted:#51655a;
+  --accent:#0b7a45; --accent-soft:#d8f0e1; --on-accent:#ffffff;
+  --warn:#8a5a00; --warn-soft:#fff0cc; --bad:#b3261e;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0f1f1a; --surface:#162a23; --well:#0b1713; --line:#27443a; --field-line:#3b6052;
+    --text:#f1f8f4; --muted:#9db3a8;
+    --accent:#7ee8a8; --accent-soft:#17382b; --on-accent:#062014;
+    --warn:#f5cf72; --warn-soft:#2b2818; --bad:#ff9d8f;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1f1a; --surface:#162a23; --well:#0b1713; --line:#27443a; --field-line:#3b6052;
+  --text:#f1f8f4; --muted:#9db3a8;
+  --accent:#7ee8a8; --accent-soft:#17382b; --on-accent:#062014;
+  --warn:#f5cf72; --warn-soft:#2b2818; --bad:#ff9d8f;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--text);font:17px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;padding:calc(14px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))}
-main{max-width:480px;margin:auto}
-.seg{display:grid;grid-template-columns:1fr 1fr;background:#0b1713;border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin-bottom:14px}
-.seg button{border:0;background:none;color:var(--muted);font:inherit;font-weight:700;padding:11px 6px;border-radius:10px}
-.seg button.on{background:#25463a;color:var(--text)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
-.card h2{margin:0 0 12px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.prices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pf label{display:block;font-size:14px;color:var(--muted);margin-bottom:6px}
-.pf .in{display:flex;align-items:center;background:#0b1713;border:2px solid #36584b;border-radius:16px;padding:0 12px}
-.pf .in:focus-within{border-color:var(--green)}
-.pf .in span{color:var(--muted);font-weight:700;margin-right:6px}
-.pf input{width:100%;min-width:0;background:none;border:0;outline:0;color:var(--text);font:800 28px system-ui;padding:12px 0}
-.meter{margin-top:14px;font-size:14px;color:var(--muted);text-align:center}
-.meter b{color:var(--text)}
-.hero{text-align:center;padding:24px 18px}
-.hero .lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.hero .ans{font-size:46px;font-weight:900;line-height:1.1;margin:6px 0;color:var(--green)}
-.hero .ans.amber{color:var(--amber)}
-.hero .sub{color:var(--text);font-size:16px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.45 var(--font);font-variant-numeric:tabular-nums;
+  padding:calc(12px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+main{max-width:480px;margin:0 auto;display:grid;gap:14px}
+.hide{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--well);border:1px solid var(--line);border-radius:14px;padding:4px}
+.seg button{border:0;background:none;color:var(--muted);font-weight:700;padding:11px 6px;border-radius:10px;cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 0 0 1px var(--line)}
+.seg.small button{padding:8px 4px;font-size:15px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:grid;gap:12px}
+.card>h2,summary.h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+.stack{display:grid;gap:12px}
+.f{display:grid;gap:5px;min-width:0}
+.f>label,.lab{font-size:14px;color:var(--muted)}
+.f input,.f select,textarea{width:100%;min-width:0;background:var(--well);border:1px solid var(--field-line);border-radius:12px;padding:11px;font-weight:600}
+.f input:focus,.f select:focus,textarea:focus{border-color:var(--accent);outline:0;box-shadow:0 0 0 2px var(--accent-soft)}
+.price .in{display:flex;align-items:center;background:var(--well);border:2px solid var(--field-line);border-radius:16px;padding:0 12px}
+.price .in:focus-within{border-color:var(--accent)}
+.price .in span{color:var(--muted);font-weight:700;margin-right:6px}
+.price input{border:0;background:none;padding:11px 0;font-size:27px;font-weight:800;box-shadow:none!important}
+.small{font-size:13.5px;color:var(--muted);line-height:1.5;margin:0}
+.center{text-align:center}
+.small b{color:var(--text)}
+.links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.links .btn{font-size:14px;padding:11px 4px}
+.btn{display:block;width:100%;text-align:center;text-decoration:none;border:1px solid var(--line);background:var(--well);color:var(--text);border-radius:12px;padding:11px 8px;font-weight:700;font-size:15px;cursor:pointer}
+.btn.main{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+.hero{text-align:center;padding:22px 16px}
+.hero .lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hero .ans{font-size:44px;font-weight:900;line-height:1.08;color:var(--accent);overflow-wrap:anywhere}
+.hero .ans.amber{color:var(--warn)}
 .hero.empty .ans{font-size:22px;color:var(--muted);font-weight:700}
-.facts{display:grid;gap:8px;margin-top:16px;text-align:left}
-.fact{display:flex;justify-content:space-between;gap:12px;background:#0b1713;border-radius:12px;padding:11px 13px;font-size:15px}
-.fact span:first-child{color:var(--muted)}.fact b{white-space:nowrap}
-.fact.win b{color:var(--green)}
-.steps{margin:0;padding-left:20px;color:var(--text);font-size:15px;line-height:1.55}
-.steps li{margin:6px 0}
-.small{font-size:13px;color:var(--muted);line-height:1.5}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.f label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
-.f input{width:100%;background:#0b1713;border:1px solid #36584b;border-radius:12px;color:var(--text);font:inherit;font-weight:700;padding:11px;outline:0}
-.f input:focus{border-color:var(--green)}
-.link{display:block;text-align:center;text-decoration:none;color:var(--text);background:#25463a;border-radius:14px;padding:14px;font-weight:700;margin-bottom:14px}
-.warn{border-left:4px solid var(--amber);background:#2b2818;border-radius:10px;padding:10px 12px;font-size:14px;color:#f6e8bd;margin-top:14px;line-height:1.5}
-details summary{color:var(--green);font-weight:700;font-size:14px;cursor:pointer;margin-top:14px}
-.hide{display:none}
+.hero .sub{font-size:15.5px;margin:0}
+.facts{display:grid;gap:8px;text-align:left}
+.fact{display:flex;justify-content:space-between;align-items:baseline;gap:12px;background:var(--well);border-radius:12px;padding:10px 12px;font-size:15px}
+.fact span{color:var(--muted)}
+.fact b{text-align:right}
+.fact.win b{color:var(--accent)}
+.fact.warn b{color:var(--warn)}
+
+.steps{margin:0;padding-left:22px;display:grid;gap:9px;font-size:15.5px}
+.box{background:var(--well);border-radius:14px;padding:12px;display:grid;gap:10px}
+.note{border-left:4px solid var(--warn);background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:14.5px;line-height:1.5}
+.note b{color:var(--text)}
+.banner{border:1px solid var(--warn);background:var(--warn-soft);border-radius:16px;padding:14px;display:grid;gap:10px;font-size:15px}
+.banner .row{display:flex;flex-wrap:wrap;gap:8px}
+.banner .btn{padding:9px 12px}
+
+details>summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"+";font-size:20px;font-weight:700;color:var(--accent);line-height:1}
+details[open]>summary::after{content:"−"}
+summary.link{color:var(--accent);font-weight:700;font-size:15px}
+details[open]>summary{margin-bottom:12px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.45}
+.check input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+ul.plain{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14.5px;line-height:1.5}
+h3{margin:4px 0 0;font-size:15px}
+textarea{min-height:76px;font-size:13px;font-weight:400;word-break:break-all}
+a{color:var(--accent)}
 </style>
 </head>
 <body>
 <main>
-<div class="seg" role="tablist">
-  <button id="tabDaily" class="on" type="button">Meu carro</button>
-  <button id="tabRent" type="button">Aluguel</button>
+
+<div class="seg" role="tablist" aria-label="Modo">
+  <button id="tabMeu" class="on" type="button" role="tab" aria-selected="true">Meu carro</button>
+  <button id="tabAlug" type="button" role="tab" aria-selected="false">Aluguel</button>
 </div>
 
-<a class="link" id="maps" href="https://www.google.com/maps/search/posto+de+combust%C3%ADvel" target="_blank" rel="noopener">Ver postos perto de mim</a>
+<div id="aviso" class="banner hide" role="status"></div>
 
-<section class="card">
+<section class="card" id="cardPrecos">
   <h2>Preço no posto (por litro)</h2>
-  <div class="prices">
-    <div class="pf"><label for="pg">Gasolina</label><div class="in"><span>R$</span><input id="pg" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
-    <div class="pf"><label for="pe">Etanol</label><div class="in"><span>R$</span><input id="pe" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+  <div class="g2">
+    <div class="f price"><label for="pg">Gasolina comum</label><div class="in"><span>R$</span><input id="pg" data-k="precos.g" inputmode="decimal" placeholder="0,00" autocomplete="off" enterkeyhint="next"></div></div>
+    <div class="f price"><label for="pe">Etanol</label><div class="in"><span>R$</span><input id="pe" data-k="precos.e" inputmode="decimal" placeholder="0,00" autocomplete="off" enterkeyhint="done"></div></div>
   </div>
-  <div class="meter" id="meter">Digite os dois preços.</div>
-  <div class="small" id="age" style="text-align:center;margin-top:4px"></div>
-</section>
-
-<section class="card hero empty" id="hero">
-  <div class="lbl" id="lbl">Abasteça com</div>
-  <div class="ans" id="ans">—</div>
-  <div class="sub" id="sub"></div>
-  <div class="facts" id="facts"></div>
-</section>
-
-<section class="card hide" id="rentBox">
-  <h2>Sua viagem</h2>
-  <div class="row2">
-    <div class="f"><label for="dist">Distância total (km)</label><input id="dist" inputmode="decimal" value="335"></div>
-    <div class="f"><label for="kml">Consumo do carro (km/L)</label><input id="kml" inputmode="decimal" value="12"></div>
-  </div>
-  <p class="small" style="margin:12px 0 4px"><b>Como fazer:</b></p>
-  <ol class="steps">
-    <li>Na retirada, confira o tanque cheio e fotografe o painel.</li>
-    <li>Não abasteça durante a viagem se o ponteiro não passar de 1/4.</li>
-    <li>Antes de devolver, encha com o combustível indicado acima, até o primeiro clique da bomba. Guarde o recibo.</li>
-  </ol>
-  <div class="warn">Só use etanol se o carro for flex (veja a tampa do tanque ou o manual). Confirme no contrato a regra de devolução.</div>
-</section>
-
-<section class="card" id="dailyBox">
-  <h2>Como decidir</h2>
-  <p class="small" style="margin:0">Etanol rende menos km por litro, então só compensa se for bem mais barato. Com a gasolina atual (32% de etanol), o ponto de virada fica perto de <b>75%</b> do preço da gasolina. Se o seu carro for diferente, ajuste:</p>
-  <details>
-    <summary>Ajustar para o meu carro</summary>
-    <div class="row2" style="margin-top:10px">
-      <div class="f"><label for="kg">Gasolina (km/L)</label><input id="kg" inputmode="decimal" placeholder="ex.: 12"></div>
-      <div class="f"><label for="ke">Etanol (km/L)</label><input id="ke" inputmode="decimal" placeholder="ex.: 8,6"></div>
+  <p class="small center" id="meter">Digite os dois preços.</p>
+  <details class="inner" id="outros" data-aba="meu">
+    <summary class="link">Tem aditivada ou premium?</summary>
+<div class="stack">
+    <div class="g2">
+      <div class="f"><label for="pa">Aditivada (R$)</label><input id="pa" data-k="precos.a" inputmode="decimal" placeholder="opcional" autocomplete="off"></div>
+      <div class="f"><label for="pp">Premium (R$)</label><input id="pp" data-k="precos.p" inputmode="decimal" placeholder="opcional" autocomplete="off"></div>
     </div>
-    <p class="small">Preencha os dois para usar o ponto de virada do seu carro (km/L do etanol ÷ km/L da gasolina). Vazio = 75%.</p>
-  </details>
+    <p class="small">A aditivada tem a mesma mistura da comum e não rende mais km. A premium tem menos etanol: o app conta um ganho pequeno de km por litro.</p>
+  </div>
+</details>
+  <div class="links">
+    <a class="btn" id="maps" href="https://www.google.com/maps/search/?api=1&amp;query=posto+de+combust%C3%ADvel" target="_blank" rel="noopener">Postos perto</a>
+    <a class="btn" id="anp" href="https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas" target="_blank" rel="noopener">Preços da ANP</a>
+  </div>
 </section>
 
-<p class="small" style="text-align:center">Gasolina comum com 32% de etanol desde 01/08/2026 (regra temporária de 180 dias). Os dados ficam só neste aparelho.</p>
+<section class="card hero empty" id="hero" aria-live="polite">
+  <div class="lbl" id="lbl">Compensa mais</div>
+  <div class="ans" id="ans">—</div>
+  <p class="sub" id="sub">Digite o preço da gasolina e do etanol.</p>
+  <div class="facts" id="facts"></div>
+  <p class="small" id="base"></p>
+</section>
+
+<section class="card" id="cardPlano" data-aba="alug">
+  <h2>Plano da viagem</h2>
+  <ol class="steps" id="passos"></ol>
+  <div class="box hide" id="meioBox">
+    <div class="f"><label for="faltam">Parada no meio: quantos km faltam até devolver?</label><input id="faltam" data-k="alug.faltam" inputmode="decimal" autocomplete="off"></div>
+    <p class="small" id="meioOut"></p>
+  </div>
+  <p class="small" id="notasPlano"></p>
+</section>
+
+<section class="card" id="cardViagem" data-aba="alug">
+  <h2>Viagem e contrato</h2>
+  <div class="g2">
+    <div class="f"><label for="kmEstrada">Estrada (km)</label><input id="kmEstrada" data-k="alug.kmEstrada" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+    <div class="f"><label for="kmCidade">Cidade (km)</label><input id="kmCidade" data-k="alug.kmCidade" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+    <div class="f"><label for="nivel">Na retirada</label>
+      <select id="nivel" data-k="alug.nivel"><option value="1">Cheio</option><option value="0.75">3/4</option><option value="0.5">1/2</option><option value="0.25">1/4</option></select></div>
+    <div class="f"><label for="regra">Devolver</label>
+      <select id="regra" data-k="alug.regra"><option value="cheio">Cheio</option><option value="mesmo">Mesmo nível</option></select></div>
+  </div>
+  <div class="f"><label for="noTanque">Combustível que veio no tanque</label>
+    <select id="noTanque" data-k="alug.noTanque"><option value="nao-sei">Não sei</option><option value="e">Etanol</option><option value="g">Gasolina</option></select></div>
+</section>
+
+<section class="card" id="cardCarro">
+  <h2 id="carroTitulo">Carro</h2>
+  <div class="f"><label for="carro" class="hide">Modelo</label><select id="carro" data-k="@.carro"></select></div>
+  <p class="small" id="carroResumo"></p>
+  <div class="seg small" id="uso" data-aba="meu" role="group" aria-label="Onde você mais roda">
+    <button type="button" data-uso="cidade">Cidade</button><button type="button" data-uso="misto">Misto</button><button type="button" data-uso="estrada">Estrada</button>
+  </div>
+  <details class="inner" id="ajCarro">
+    <summary class="link">Ajustar os números do carro</summary>
+<div class="stack">
+    <div class="g2">
+      <div class="f"><label for="gc">Gasolina, cidade (km/L)</label><input id="gc" data-k="@.gc" inputmode="decimal" autocomplete="off"></div>
+      <div class="f"><label for="gh">Gasolina, estrada (km/L)</label><input id="gh" data-k="@.gh" inputmode="decimal" autocomplete="off"></div>
+      <div class="f"><label for="ec">Etanol, cidade (km/L)</label><input id="ec" data-k="@.ec" inputmode="decimal" autocomplete="off"></div>
+      <div class="f"><label for="eh">Etanol, estrada (km/L)</label><input id="eh" data-k="@.eh" inputmode="decimal" autocomplete="off"></div>
+      <div class="f" data-aba="alug"><label for="tanque">Tanque (litros)</label><input id="tanque" data-k="@.tanque" inputmode="decimal" placeholder="veja no manual" autocomplete="off"></div>
+    </div>
+    <label class="check" for="pbev"><input type="checkbox" id="pbev" data-k="@.pbev"><span>São números da etiqueta do Inmetro. Ela é medida com gasolina de 22% de etanol, então o app desconta a mistura de hoje. Desmarque se você mesmo mediu.</span></label>
+    <div class="box" data-aba="meu">
+      <p class="lab" style="margin:0"><b>Consumo real medido por você</b> (vale mais que a etiqueta)</p>
+      <div class="g2">
+        <div class="f"><label for="realG">Na gasolina (km/L)</label><input id="realG" data-k="meu.realG" inputmode="decimal" placeholder="opcional" autocomplete="off"></div>
+        <div class="f"><label for="realE">No etanol (km/L)</label><input id="realE" data-k="meu.realE" inputmode="decimal" placeholder="opcional" autocomplete="off"></div>
+      </div>
+      <p class="small">Como medir: encha até o primeiro clique, zere o hodômetro parcial, rode e encha de novo. Divida os km rodados pelos litros que entraram.</p>
+      <div class="g2">
+        <div class="f"><label for="mKm">Km rodados</label><input id="mKm" inputmode="decimal" autocomplete="off"></div>
+        <div class="f"><label for="mL">Litros que entraram</label><input id="mL" inputmode="decimal" autocomplete="off"></div>
+      </div>
+      <div class="g2">
+        <button class="btn" type="button" id="mG">Usar na gasolina</button>
+        <button class="btn" type="button" id="mE">Usar no etanol</button>
+      </div>
+      <p class="small" id="mOut"></p>
+    </div>
+  </div>
+</details>
+</section>
+
+<details class="card" id="cardCheck" data-aba="alug">
+  <summary class="h2">Na retirada e na devolução</summary>
+<div class="stack">
+  <h3>Na retirada</h3>
+  <ul class="plain">
+    <li>Confira se o ponteiro marca cheio e fotografe o painel com o carro ligado (ponteiro e hodômetro).</li>
+    <li>Se não estiver cheio, peça para completarem ou para anotarem o nível no contrato antes de sair.</li>
+    <li>Confirme que o carro é flex (tampa do tanque ou manual) e pergunte com que combustível ele está.</li>
+  </ul>
+  <h3>Na devolução</h3>
+  <ul class="plain">
+    <li>Abasteça em um posto perto da agência e pare no primeiro clique da bomba.</li>
+    <li>Guarde o cupom e fotografe o painel junto com ele.</li>
+    <li>Tanque abaixo do combinado: a locadora cobra o combustível que falta e uma taxa de serviço.</li>
+    <li>Na Localiza a leitura do ponteiro é em oitavos. Se você rodar menos de 100 km e o ponteiro não se mexer, ela cobra por estimativa, então abasteça do mesmo jeito.</li>
+  </ul>
+</div>
+</details>
+
+<details class="card" id="cardAjustes">
+  <summary class="h2">Ajustes, cópia de segurança e fontes</summary>
+<div class="stack">
+  <div class="g2">
+    <div class="f"><label for="cMistura">Etanol na gasolina comum (%)</label><input id="cMistura" data-cfg="mistura" inputmode="decimal" autocomplete="off"></div>
+    <div class="f"><label for="cPremium">Etanol na premium (%)</label><input id="cPremium" data-cfg="premium" inputmode="decimal" autocomplete="off"></div>
+    <div class="f"><label for="cMargem">Folga no consumo (%)</label><input id="cMargem" data-cfg="margem" inputmode="decimal" autocomplete="off"></div>
+    <div class="f"><label for="cReserva">Reserva do tanque (%)</label><input id="cReserva" data-cfg="reserva" inputmode="decimal" autocomplete="off"></div>
+    <div class="f"><label for="cEmpate">Empate abaixo de (%)</label><input id="cEmpate" data-cfg="empate" inputmode="decimal" autocomplete="off"></div>
+  </div>
+  <p class="small" id="cfgNota"></p>
+
+  <h3>Cópia de segurança</h3>
+  <p class="small">Os dados ficam só neste aparelho. Para levar a outro aparelho ou navegador, copie o código aqui e cole lá.</p>
+  <div class="g2">
+    <button class="btn" type="button" id="btnExport">Copiar meus dados</button>
+    <button class="btn" type="button" id="btnImport">Usar código colado</button>
+  </div>
+  <div class="f"><label for="txtBackup">Código</label><textarea id="txtBackup" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea></div>
+  <p class="small" id="bkOut" role="status"></p>
+  <button class="btn" type="button" id="btnReset">Apagar tudo e voltar ao padrão</button>
+
+  <h3>Como a conta é feita</h3>
+  <ul class="plain">
+    <li><b>Meu carro:</b> compara o custo por km de cada combustível (preço dividido pelos km/L).</li>
+    <li><b>Consumo:</b> vem da etiqueta do Inmetro, medida com gasolina de 22% de etanol. O app desconta a mistura atual, porque mais etanol na gasolina rende menos km.</li>
+    <li><b>Aluguel com devolução de tanque cheio:</b> o último abastecimento só repõe litros, então vale o menor preço por litro. O que você abastece no meio da viagem é queimado por você, então vale o menor custo por km.</li>
+    <li><b>Empate:</b> diferença pequena entra como "tanto faz", porque fica abaixo do erro das estimativas.</li>
+  </ul>
+  <p class="small">Fontes: Inmetro, Tabela PBEV 2026 (revisão de 27/02/2026); ANP e CNPE (gasolina com 32% de etanol desde 01/08/2026, regra temporária); AEA, SIMEA 2025 (energia por litro de cada mistura). Detalhes em <a href="https://github.com/lugustavos/combustivel#readme" target="_blank" rel="noopener">github.com/lugustavos/combustivel</a>.</p>
+  <p class="small" id="versao">Versão 4.0</p>
+</div>
+</details>
+
 </main>
-<script>
-const $=id=>document.getElementById(id);
-const num=id=>{const n=parseFloat(String($(id).value).replace(',','.'));return isFinite(n)&&n>0?n:null};
-const BRL=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const F1=v=>v.toLocaleString('pt-BR',{maximumFractionDigits:1});
-let mode='daily';
-function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
 
-function setMode(m){
-  mode=m;
-  $('tabRent').classList.toggle('on',m==='rent');$('tabDaily').classList.toggle('on',m==='daily');
-  $('rentBox').classList.toggle('hide',m!=='rent');$('dailyBox').classList.toggle('hide',m!=='daily');
-  calc();
-}
-function setHero(empty,lbl,ans,amber,sub,facts){
-  $('hero').classList.toggle('empty',empty);$('lbl').textContent=lbl;
-  $('ans').textContent=ans;$('ans').classList.toggle('amber',!!amber);
-  $('sub').textContent=sub||'';
-  $('facts').innerHTML=(facts||[]).map(f=>`<div class="fact${f.win?' win':''}"><span>${f.k}</span><b>${f.v}</b></div>`).join('');
-}
-function calc(){
-  const g=num('pg'),e=num('pe');
-  if(g&&e)$('meter').innerHTML=`Etanol está a <b>${(e/g*100).toFixed(0)}%</b> do preço da gasolina`;
-  else $('meter').textContent='Digite os dois preços.';
-  const st=ls('cmb3_at');
-  if(st&&(g||e)){const d=new Date(Number(st));$('age').textContent='Preços de '+d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+(d.toDateString()!==new Date().toDateString()?' (confira se ainda valem)':'')}else $('age').textContent='';
+<script id="dados">
+/* Consumo da etiqueta do Inmetro: Tabela PBEV 2026, revisão de 27/02/2026 (km/L).
+   Colunas: id, marca, modelo, etanol cidade, etanol estrada, gasolina cidade, gasolina estrada,
+   consumo energético (MJ/km), tanque em litros (null = não conferido em fonte do fabricante).
+   A gasolina do ensaio tem 22% de etanol; o app ajusta para a mistura atual. */
+const CARROS = [
+["mobi-like","Fiat","Mobi Like 1.0",10.1,11.1,14.5,15.8,1.4,44],
+["mobi-trek","Fiat","Mobi Trekking 1.0",9.8,10.6,14.0,15.1,1.46,44],
+["argo-10","Fiat","Argo 1.0 (manual)",9.4,10.4,13.6,14.5,1.52,48],
+["argo-13cvt","Fiat","Argo 1.3 automático (CVT)",9.0,10.3,12.8,14.3,1.58,48],
+["argo-13mt","Fiat","Argo Trekking 1.3 (manual)",8.9,10.2,12.9,14.7,1.57,48],
+["cronos-10","Fiat","Cronos 1.0 (manual)",9.7,11.2,13.4,15.9,1.46,null],
+["cronos-13mt","Fiat","Cronos 1.3 (manual)",9.2,11.0,13.3,15.7,1.49,null],
+["cronos-13cvt","Fiat","Cronos 1.3 automático (CVT)",8.9,10.7,12.6,14.6,1.57,null],
+["pulse-13mt","Fiat","Pulse 1.3 (manual)",9.0,10.3,12.6,14.5,1.58,null],
+["pulse-13cvt","Fiat","Pulse 1.3 automático (CVT)",8.9,10.5,13.0,14.7,1.56,null],
+["pulse-t200","Fiat","Pulse 1.0 turbo (CVT)",8.6,10.0,12.3,14.4,1.63,null],
+["pulse-hyb","Fiat","Pulse 1.0 turbo híbrido",9.3,10.2,13.4,14.4,1.54,null],
+["fastback-t200","Fiat","Fastback 1.0 turbo (CVT)",8.5,10.1,12.1,14.3,1.65,null],
+["fastback-hyb","Fiat","Fastback 1.0 turbo híbrido",8.9,9.8,12.6,13.9,1.62,null],
+["strada-cs","Fiat","Strada 1.3 cabine simples (manual)",9.1,10.1,13.0,14.7,1.56,null],
+["strada-cd","Fiat","Strada Freedom 1.3 cabine dupla (manual)",8.9,10.1,12.8,14.4,1.59,null],
+["strada-volc-mt","Fiat","Strada Volcano 1.3 (manual)",8.9,9.8,12.4,13.9,1.63,null],
+["strada-volc-cvt","Fiat","Strada Volcano 1.3 automática (CVT)",8.9,9.7,12.6,13.5,1.63,null],
+["strada-t200","Fiat","Strada 1.0 turbo (CVT)",8.3,9.2,11.9,13.1,1.73,null],
+["hb20-10","Hyundai","HB20 1.0 (manual)",9.9,10.7,13.3,15.4,1.48,50],
+["hb20-turbo","Hyundai","HB20 1.0 turbo automático",9.2,10.2,13.2,14.7,1.54,50],
+["hb20s-10","Hyundai","HB20S 1.0 (manual)",9.7,10.9,13.4,15.4,1.47,null],
+["hb20s-turbo","Hyundai","HB20S 1.0 turbo automático",9.2,10.7,13.0,15.2,1.53,null],
+["creta-turbo","Hyundai","Creta 1.0 turbo automático",8.4,9.0,12.0,12.7,1.74,null],
+["onix-10","Chevrolet","Onix 1.0 (manual)",9.5,11.3,13.5,16.3,1.45,44],
+["onix-turbo-mt","Chevrolet","Onix 1.0 turbo (manual)",9.8,12.4,13.7,17.7,1.38,44],
+["onix-turbo-at","Chevrolet","Onix 1.0 turbo automático",8.6,10.9,12.1,15.3,1.59,44],
+["onixplus-10","Chevrolet","Onix Plus 1.0 (manual)",9.8,12.1,13.9,17.1,1.39,44],
+["onixplus-turbo-mt","Chevrolet","Onix Plus 1.0 turbo (manual)",9.2,12.3,13.3,16.8,1.44,44],
+["onixplus-turbo-at","Chevrolet","Onix Plus 1.0 turbo automático",8.5,11.2,12.2,16.0,1.57,44],
+["tracker-10","Chevrolet","Tracker 1.0 turbo automático",8.1,9.9,11.5,13.8,1.72,null],
+["tracker-12","Chevrolet","Tracker 1.2 turbo automático",7.6,9.7,11.0,13.7,1.8,null],
+["spin-mt","Chevrolet","Spin 1.8 (manual)",7.8,8.8,11.0,12.6,1.85,null],
+["spin-at","Chevrolet","Spin 1.8 automática",7.1,9.1,10.1,13.1,1.92,null],
+["montana-mt","Chevrolet","Montana 1.2 turbo (manual)",8.4,9.7,12.3,13.7,1.66,null],
+["montana-at","Chevrolet","Montana 1.2 turbo automática",7.5,9.7,11.0,13.5,1.8,null],
+["polo-mpi","Volkswagen","Polo 1.0 MPI (manual; vale para o Track)",9.3,10.9,13.5,15.7,1.48,49],
+["polo-tsi","Volkswagen","Polo 1.0 TSI automático",9.0,11.1,13.1,16.1,1.5,49],
+["polo-high","Volkswagen","Polo Highline TSI automático",8.8,10.7,12.5,15.2,1.57,49],
+["virtus-tsi-mt","Volkswagen","Virtus 1.0 TSI (manual)",9.2,11.2,13.2,15.8,1.49,null],
+["virtus-tsi-at","Volkswagen","Virtus 1.0 TSI automático",8.5,10.4,12.2,14.9,1.62,null],
+["virtus-200","Volkswagen","Virtus 200 TSI automático (Comfortline/Highline)",8.3,10.2,12.1,14.7,1.64,null],
+["tera-mpi","Volkswagen","Tera 1.0 MPI (manual)",9.3,10.4,13.4,15.0,1.52,null],
+["tera-tsi-mt","Volkswagen","Tera 1.0 TSI (manual)",9.0,10.3,12.9,15.0,1.56,null],
+["tera-tsi-at","Volkswagen","Tera 1.0 TSI automático",8.6,10.3,12.2,14.5,1.62,null],
+["tcross-200","Volkswagen","T-Cross 200 TSI automático",8.5,10.2,12.1,14.5,1.64,null],
+["tcross-250","Volkswagen","T-Cross 250 TSI automático",8.2,9.9,11.8,14.2,1.69,null],
+["nivus-200","Volkswagen","Nivus 200 TSI automático",8.6,10.3,12.4,14.8,1.61,null],
+["saveiro-cs","Volkswagen","Saveiro 1.6 cabine simples",7.7,8.8,11.2,12.9,1.83,null],
+["saveiro-cd","Volkswagen","Saveiro 1.6 cabine dupla",7.9,8.7,11.3,12.4,1.83,null],
+["kwid","Renault","Kwid 1.0",10.4,10.7,14.4,15.4,1.41,38],
+["kardian-mt","Renault","Kardian 1.0 turbo (manual)",8.8,10.2,12.7,14.7,1.59,null],
+["kardian-at","Renault","Kardian 1.0 turbo automático",8.8,9.8,12.2,13.8,1.64,null],
+["duster-16mt","Renault","Duster 1.6 (manual)",7.6,8.4,11.2,12.3,1.88,null],
+["duster-16cvt","Renault","Duster 1.6 automático (CVT)",7.5,8.3,10.8,11.4,1.94,null],
+["duster-13t","Renault","Duster 1.3 turbo (CVT)",7.5,8.6,10.9,12.3,1.89,null],
+["c3-10","Citroën","C3 1.0 (manual)",9.3,10.3,13.2,14.5,1.54,47],
+["c3-xtr","Citroën","C3 XTR 1.0 (manual)",9.5,10.3,13.0,14.2,1.55,47],
+["c3-turbo","Citroën","C3 1.0 turbo (CVT)",8.1,8.9,11.5,12.9,1.78,47],
+["basalt-10","Citroën","Basalt 1.0 (manual)",9.2,10.1,13.2,14.3,1.56,null],
+["basalt-turbo","Citroën","Basalt 1.0 turbo (CVT)",8.4,9.6,12.1,13.7,1.69,null],
+["aircross","Citroën","Aircross 1.0 turbo (CVT)",7.9,9.1,11.2,13.0,1.8,null],
+["208-10","Peugeot","208 1.0 (manual)",9.5,10.8,13.6,15.3,1.49,47],
+["208-turbo","Peugeot","208 1.0 turbo (CVT)",8.3,9.7,12.0,13.7,1.69,47],
+["2008","Peugeot","2008 1.0 turbo (CVT)",8.5,9.8,12.0,14.1,1.66,null],
+["renegade","Jeep","Renegade 1.3 turbo automático",7.8,8.9,11.1,12.4,1.84,null],
+["compass","Jeep","Compass 1.3 turbo automático",7.3,8.6,10.1,12.1,1.97,null],
+["kicks","Nissan","Kicks 1.0 turbo automático",8.3,9.9,11.7,14.3,1.69,null],
+["versa","Nissan","Versa 1.6 (CVT)",7.9,10.5,11.5,15.0,1.69,null],
+["corolla-20","Toyota","Corolla 2.0 (CVT)",8.3,10.1,11.6,14.6,1.68,null],
+["corolla-hev","Toyota","Corolla híbrido 1.8",12.5,10.7,17.5,15.2,1.26,null],
+["cross-20","Toyota","Corolla Cross 2.0 (CVT)",7.9,9.2,11.5,13.1,1.78,null],
+["cross-hev","Toyota","Corolla Cross híbrido 1.8",11.6,9.9,16.6,14.0,1.36,null],
+["yariscross","Toyota","Yaris Cross 1.5 (CVT)",8.8,10.2,12.6,14.3,1.6,null],
+["yariscross-hev","Toyota","Yaris Cross híbrido 1.5",13.2,10.7,17.9,15.3,1.23,null],
+["city-sedan","Honda","City sedã 1.5 (CVT)",9.3,10.4,12.8,15.5,1.53,null],
+["city-hatch","Honda","City hatch 1.5 (CVT)",9.2,10.5,13.2,15.0,1.53,null],
+["hrv-15","Honda","HR-V 1.5 (CVT)",8.8,9.9,12.5,13.9,1.63,null],
+["hrv-turbo","Honda","HR-V 1.5 turbo (CVT)",8.1,9.1,11.5,12.9,1.78,null],
+["wrv","Honda","WR-V 1.5 (CVT)",8.2,8.9,12.0,12.8,1.76,null]
+];
+</script>
 
-  if(!g||!e){setHero(true,mode==='rent'?'Abasteça com':'Compensa mais','—',false,'Preencha gasolina e etanol acima.',[]);save();return}
+<script id="nucleo">
+/* Núcleo de cálculo: funções puras, sem tela. Testado em tests/nucleo.test.mjs. */
+const Core = (function () {
+  'use strict';
 
-  if(mode==='rent'){
-    // Devolução com tanque cheio: você repõe os litros que o carro gastou, então vale o menor preço por litro.
-    const d=num('dist'),k=num('kml');
-    const best=e<g?'ETANOL':'GASOLINA',bp=Math.min(e,g),wp=Math.max(e,g);
-    let facts=[],sub=`${BRL(bp)} por litro, contra ${BRL(wp)}.`;
-    if(d&&k){
-      const L=d/k;
-      facts=[{k:'Litros para repor (estimativa)',v:'≈ '+F1(L)+' L'},
-             {k:best==='ETANOL'?'Etanol':'Gasolina',v:BRL(L*bp),win:true},
-             {k:best==='ETANOL'?'Gasolina':'Etanol',v:BRL(L*wp)},
-             {k:'Você economiza',v:BRL(L*(wp-bp)),win:true}];
-    }
-    setHero(false,'Na devolução, encha com',best,false,sub,facts);
-  }else{
-    const kg=num('kg'),ke=num('ke');
-    const be=(kg&&ke)?ke/kg*100:75,rel=e/g*100;
-    const diff=rel-be;
-    let ans,amber=false,sub;
-    if(Math.abs(diff)<2){ans='TANTO FAZ';amber=true;sub=`Etanol a ${rel.toFixed(0)}% e o ponto de virada é ${be.toFixed(0)}%: praticamente empate.`}
-    else if(diff<0){ans='ETANOL';sub=`Etanol está a ${rel.toFixed(0)}% e compensa até ${be.toFixed(0)}%.`}
-    else{ans='GASOLINA';sub=`Etanol está a ${rel.toFixed(0)}%, acima do ponto de virada de ${be.toFixed(0)}%.`}
-    const facts=[];
-    if(kg&&ke){facts.push({k:'Gasolina por km',v:BRL(g/kg),win:g/kg<e/ke},{k:'Etanol por km',v:BRL(e/ke),win:e/ke<g/kg})}
-    setHero(false,'Compensa mais',ans,amber,sub,facts);
+  /* Energia por litro (MJ/L). Fonte: Oliveira et al., "Influencing Flex Fuel Car Customers at the
+     Gas Station", SIMEA 2025 (AEA), Tabela 1: gasolina A 31,65; E22 29,35; E25 29,03; E27 28,82.
+     Daí sai o etanol anidro (21,195 MJ/L) e a reta abaixo, que reproduz E25 e E27. */
+  const E_GASOLINA_A = 31.65, E_ANIDRO = 21.195;
+  const MISTURA_INMETRO = 22;   // etanol na gasolina usada no ensaio da etiqueta
+
+  /* Mistura de 32%: Resolução CNPE 9/2026, em vigor de 01/08/2026 por 180 dias, prorrogável uma vez. */
+  const FIM_REGRA_E32 = Date.UTC(2027, 0, 28);
+  const SEIS_MESES = 183 * 864e5;
+
+  function energia(pct) { return E_GASOLINA_A - (E_GASOLINA_A - E_ANIDRO) * pct / 100; }
+  function fatorMistura(pct) { return energia(pct) / energia(MISTURA_INMETRO); }
+
+  /* Lê número digitado à brasileira ("6,86", "R$ 6,859", "6.86"). Devolve null se não for positivo. */
+  function num(v) {
+    if (typeof v === 'number') return isFinite(v) && v > 0 ? v : null;
+    if (v == null) return null;
+    let s = String(v).replace(/[^\d.,-]/g, '');
+    if (!s || s.indexOf('-') >= 0) return null;
+    if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+    const n = Number(s);
+    return isFinite(n) && n > 0 ? n : null;
   }
-  save();
-}
-const IDS=['pg','pe','dist','kml','kg','ke'];
-function save(){ls('cmb3',JSON.stringify(Object.fromEntries(IDS.map(i=>[i,$(i).value]))))}
-['pg','pe'].forEach(i=>$(i).addEventListener('input',()=>{ls('cmb3_at',String(Date.now()));calc()}));
-['dist','kml','kg','ke'].forEach(i=>$(i).addEventListener('input',calc));
-$('tabRent').onclick=()=>setMode('rent');$('tabDaily').onclick=()=>setMode('daily');
-try{const sv=JSON.parse(ls('cmb3')||'{}');IDS.forEach(i=>{if(sv[i]!==undefined&&sv[i]!=='')$(i).value=sv[i]})}catch(e){}
-setMode('daily');
-if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+  /* Média de consumo ponderada pela distância (cidade = fração dos km em cidade). */
+  function media(kc, kh, cidade) {
+    if (cidade >= 1) return kc;
+    if (cidade <= 0) return kh;
+    return 1 / (cidade / kc + (1 - cidade) / kh);
+  }
+
+  /* Carro flex típico: mediana dos 1.0 manuais da tabela de 2026 (números de etiqueta). */
+  const TIPICO = { gc: 13.5, gh: 15.4, ec: 9.5, eh: 10.7 };
+
+  /* Preenche o que faltar no perfil usando as proporções do carro típico. */
+  function completar(p) {
+    let gc = num(p.gc), gh = num(p.gh), ec = num(p.ec), eh = num(p.eh);
+    const estimado = [];
+    const rg = TIPICO.gh / TIPICO.gc, re = TIPICO.eh / TIPICO.ec;
+    const rc = TIPICO.ec / TIPICO.gc, rh = TIPICO.eh / TIPICO.gh;
+    if (!gc && !gh && !ec && !eh) return { gc: TIPICO.gc, gh: TIPICO.gh, ec: TIPICO.ec, eh: TIPICO.eh, estimado: ['gc', 'gh', 'ec', 'eh'] };
+    if (!gc && !gh) {
+      if (!ec) { ec = eh / re; estimado.push('ec'); }
+      if (!eh) { eh = ec * re; estimado.push('eh'); }
+      gc = ec / rc; gh = eh / rh; estimado.push('gc', 'gh');
+    } else {
+      if (!gc) { gc = gh / rg; estimado.push('gc'); }
+      if (!gh) { gh = gc * rg; estimado.push('gh'); }
+      if (!ec && !eh) { ec = gc * rc; eh = gh * rh; estimado.push('ec', 'eh'); }
+      else {
+        if (!ec) { ec = eh / re; estimado.push('ec'); }
+        if (!eh) { eh = ec * re; estimado.push('eh'); }
+      }
+    }
+    return { gc: gc, gh: gh, ec: ec, eh: eh, estimado: estimado };
+  }
+
+  /* Km/L esperados de gasolina (g) e etanol (e) para um perfil, um uso e uma mistura.
+     perfil.pbev !== false: os números de gasolina são da etiqueta (22%) e levam o desconto da mistura.
+     perfil.pbev === false: já foram medidos com a gasolina da bomba e ficam como estão. */
+  function consumo(perfil, cidade, mistura) {
+    const f = fatorMistura(mistura);
+    const naBomba = perfil.pbev === false;
+    const dv = function (v) { const n = num(v); return n ? n / f : null; };
+    const p = completar(naBomba ? { gc: dv(perfil.gc), gh: dv(perfil.gh), ec: perfil.ec, eh: perfil.eh } : perfil);
+    return {
+      g: media(p.gc * f, p.gh * f, cidade), e: media(p.ec, p.eh, cidade),
+      gc: p.gc * f, gh: p.gh * f, ec: p.ec, eh: p.eh, fator: f, estimado: p.estimado
+    };
+  }
+
+  /* Dia a dia: custo por km de cada combustível com preço informado. */
+  function diaADia(inp) {
+    const cfg = inp.cfg, perfil = inp.perfil;
+    const c = consumo(perfil, inp.cidade, cfg.mistura);
+    let g = c.g, e = c.e, base = perfil.pbev === false ? 'bomba' : 'inmetro';
+    const rg = num(perfil.realG), re = num(perfil.realE);
+    if (rg && re) { g = rg; e = re; base = 'medido'; }
+    else if (rg) { e = rg * (c.e / c.g); g = rg; base = 'medido-g'; }
+    else if (re) { g = re * (c.g / c.e); e = re; base = 'medido-e'; }
+    const pg = num(inp.precos.g), pe = num(inp.precos.e), pa = num(inp.precos.a), pp = num(inp.precos.p);
+    const lista = [];
+    if (pg) lista.push({ id: 'g', preco: pg, km: g });
+    if (pe) lista.push({ id: 'e', preco: pe, km: e });
+    if (pa) lista.push({ id: 'a', preco: pa, km: g });
+    if (pp) lista.push({ id: 'p', preco: pp, km: g * energia(cfg.premium) / energia(cfg.mistura) });
+    lista.forEach(function (x) { x.custo = x.preco / x.km; });
+    lista.sort(function (a, b) { return a.custo - b.custo || a.preco - b.preco; });
+    const out = { lista: lista, km: { g: g, e: e }, base: base, estimado: c.estimado, paridade: e / g };
+    if (pg && pe) { out.relacao = pe / pg; out.etanolAte = pg * e / g; }
+    if (lista.length >= 2) {
+      out.melhor = lista[0]; out.segundo = lista[1];
+      out.diferenca = lista[1].custo / lista[0].custo - 1;
+      out.empate = out.diferenca < cfg.empate / 100;
+    }
+    return out;
+  }
+
+  /* Parada no meio da viagem: quantos litros colocar para rodar os km que faltam. */
+  function paradaMeio(a) {
+    const r = a.reserva / 100, alvo = a.alvo == null ? 1 : a.alvo;
+    const cabe = a.tanque * (1 - r);                                   // do nível de reserva até cheio
+    const rodar = a.faltamKm / a.km * (1 + a.margem / 100);            // para chegar, com folga
+    // Se o combustível do meio é o mesmo do fim, já dá para deixar o tanque no nível da devolução.
+    const precisa = rodar + (a.mesmoDoFim ? Math.max(0, a.tanque * (alvo - r)) : 0);
+    return { litros: Math.min(precisa, cabe), precisa: precisa, encher: precisa >= cabe - 1e-9, maisParadas: rodar > cabe + 1e-9 };
+  }
+
+  /* Aluguel: plano de abastecimento para devolver o carro no nível combinado gastando o mínimo.
+     Regra: o último abastecimento só repõe litros (vale o menor preço por litro); o que entra no
+     meio da viagem é queimado por quem dirige (vale o menor custo por km, e só o necessário). */
+  function aluguel(inp) {
+    const cfg = inp.cfg, perfil = inp.perfil;
+    const pg = num(inp.precos.g), pe = num(inp.precos.e);
+    const dC = num(inp.kmCidade) || 0, dE = num(inp.kmEstrada) || 0, D = dC + dE;
+    const cidade = D > 0 ? dC / D : 0.55;
+    const c = consumo(perfil, cidade, cfg.mistura);
+    const T = num(perfil.tanque);
+    let s = Number(inp.nivel); if (!(s > 0 && s <= 1)) s = 1;
+    const alvo = inp.regra === 'mesmo' ? s : 1;
+    const m = cfg.margem / 100, r = cfg.reserva / 100;
+    const out = { D: D, cidade: cidade, km: { g: c.g, e: c.e }, tanque: T, nivel: s, alvo: alvo, estimado: c.estimado };
+    if (!pg || !pe) { out.falta = 'precos'; return out; }
+    const pr = { g: pg, e: pe };
+    const fFim = pe < pg ? 'e' : 'g';
+    const custoKm = { g: pg / c.g, e: pe / c.e };
+    let fMeio = custoKm.e < custoKm.g ? 'e' : 'g';
+    out.meioEmpate = Math.abs(custoKm.e - custoKm.g) / Math.min(custoKm.e, custoKm.g) < cfg.empate / 100;
+    if (out.meioEmpate) fMeio = fFim;
+    out.fimEmpate = pg === pe; out.fFim = fFim; out.outroFim = fFim === 'e' ? 'g' : 'e';
+    out.fMeio = fMeio; out.custoKm = custoKm; out.precos = pr;
+    if (D <= 0) { out.semViagem = true; return out; }
+
+    const sabe = inp.noTanque === 'g' || inp.noTanque === 'e';
+    const pior = sabe ? inp.noTanque : 'e', melhor = sabe ? inp.noTanque : 'g';
+    out.noTanque = { sabe: sabe, pior: pior, melhor: melhor };
+    const par = function (a, b) { return a <= b ? [a, b] : [b, a]; };
+
+    if (!T) {
+      const a = D / c[melhor], b = D / c[pior] * (1 + m);
+      out.semTanque = true; out.status = null; out.paradas = 0;
+      out.litros = [a, b]; out.fim = [a, b]; out.custo = [a * pr[fFim], b * pr[fFim]];
+      out.economia = [a * (pg - pr[fFim]), b * (pg - pr[fFim])];
+      return out;
+    }
+
+    const util = Math.max(0, T * (s - r));
+    const precisaEsp = D / c[pior], precisaSeg = precisaEsp * (1 + m);
+    out.util = util;
+    out.autonomia = util * c[pior] / (1 + m);
+    out.status = precisaSeg <= util + 1e-9 ? 'folga' : precisaEsp <= util + 1e-9 ? 'apertado' : 'nao';
+
+    /* plano: combustível do meio, combustível do fim e se enche o tanque em toda parada (hábito comum). */
+    function simular(inicial, fator, plano) {
+      const cMeio = plano ? plano.meio : fMeio, cFim = plano ? plano.fim : fFim, sempreEnche = !!(plano && plano.encher);
+      const lpk = function (f) { return fator / c[f]; };
+      let nivel = T * s, falta = D, atual = inicial, custo = 0, queimado = 0, giro = 0;
+      const paradas = [], comprado = { g: 0, e: 0 };
+      while (falta > 1e-9 && giro++ < 200) {
+        const alcance = Math.max(0, nivel - T * r) / lpk(atual);
+        if (alcance >= falta - 1e-9) { nivel -= falta * lpk(atual); queimado += falta * lpk(atual); falta = 0; break; }
+        nivel -= alcance * lpk(atual); queimado += alcance * lpk(atual); falta -= alcance;
+        const cabe = T - nivel, precisa = falta * lpk(cMeio);
+        // Mesmo combustível do fim: já completa até o nível de devolução. Outro: só o necessário para chegar.
+        const litros = sempreEnche ? cabe : Math.min(cabe, cMeio === cFim ? precisa + Math.max(0, T * alvo - nivel) : precisa);
+        paradas.push({ combustivel: cMeio, litros: litros });
+        custo += litros * pr[cMeio]; comprado[cMeio] += litros; nivel += litros; atual = cMeio;
+      }
+      const fim = Math.max(0, T * alvo - nivel);
+      custo += fim * pr[cFim]; comprado[cFim] += fim;
+      return { paradas: paradas, fim: fim, custo: custo, comprado: comprado, total: comprado.g + comprado.e, queimado: queimado };
+    }
+
+    const ot = simular(melhor, 1), co = simular(pior, 1 + m);
+    out.otimista = ot; out.conservador = co;
+    out.paradas = co.paradas.length;
+    out.litros = par(ot.total, co.total); out.fim = par(ot.fim, co.fim); out.custo = par(ot.custo, co.custo);
+    // Economia: o plano contra o hábito de pôr só gasolina e encher o tanque em toda parada.
+    const soGas = { meio: 'g', fim: 'g', encher: true };
+    out.economia = par(Math.max(0, simular(melhor, 1, soGas).custo - ot.custo), Math.max(0, simular(pior, 1 + m, soGas).custo - co.custo));
+    out.extra = Math.max(0, T * (alvo - s));
+    if (out.status !== 'folga') {
+      const faltam = Math.max(0, D - out.autonomia);
+      out.meio = paradaMeio({ faltamKm: faltam, km: c[fMeio], margem: cfg.margem, tanque: T, reserva: cfg.reserva, mesmoDoFim: fMeio === fFim, alvo: alvo });
+      out.meio.faltamKm = faltam;
+    }
+    return out;
+  }
+
+  /* A mistura da gasolina muda por decisão do governo. 0 = nada a fazer; 1 = a regra temporária
+     de 32% venceu e ainda não foi conferida; 2 = faz mais de 6 meses desde a última conferência. */
+  function conferirMistura(agora, conferidaEm) {
+    if (agora < FIM_REGRA_E32) return 0;
+    if (!conferidaEm || conferidaEm < FIM_REGRA_E32) return 1;
+    return agora - conferidaEm > SEIS_MESES ? 2 : 0;
+  }
+
+  return { num: num, energia: energia, fatorMistura: fatorMistura, media: media, completar: completar, consumo: consumo,
+    diaADia: diaADia, aluguel: aluguel, paradaMeio: paradaMeio, conferirMistura: conferirMistura,
+    TIPICO: TIPICO, MISTURA_INMETRO: MISTURA_INMETRO, FIM_REGRA_E32: FIM_REGRA_E32 };
+})();
+if (typeof globalThis !== 'undefined') globalThis.Core = Core;
+</script>
+
+<script id="app">
+/* Tela: lê os campos, guarda no aparelho e mostra o resultado do núcleo. */
+(function () {
+  'use strict';
+  const $ = function (id) { return document.getElementById(id); };
+  const num = Core.num;
+  const BRL = function (v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); };
+  const BRL0 = function (v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }); };
+  const n = function (v, d) { d = d == null ? 1 : d; return v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  const txt = function (v) { return v == null ? '' : String(v).replace('.', ','); };
+  const NOME = { g: 'gasolina', e: 'etanol', a: 'gasolina aditivada', p: 'gasolina premium' };
+  const TITULO = { g: 'GASOLINA', e: 'ETANOL', a: 'ADITIVADA', p: 'PREMIUM' };
+  const CURTO = { g: 'Gasolina', e: 'Etanol', a: 'Aditivada', p: 'Premium' };
+  const FRACAO = { '1': 'cheio', '0.75': '3/4', '0.5': '1/2', '0.25': '1/4' };
+  const USO = { cidade: 1, misto: 0.55, estrada: 0 };
+  const LIMITES = { mistura: [0, 40, 32], premium: [0, 40, 25], margem: [0, 50, 15], reserva: [0, 40, 15], empate: [0, 15, 3] };
+
+  /* Carros: os da tabela do Inmetro mais dois perfis genéricos. */
+  const ESPECIAIS = {
+    tipico: { nome: 'Flex típico (1.0)', ec: 9.5, eh: 10.7, gc: 13.5, gh: 15.4, tanque: null },
+    grupo: { nome: 'Ainda não sei (pior caso)', ec: 9.3, eh: 10.3, gc: 13.2, gh: 14.5, tanque: 44 }
+  };
+  const LOCADORA = ['mobi-like', 'kwid', 'argo-10', 'hb20-10', 'onix-10', 'polo-mpi', 'c3-10', '208-10'];
+  const porId = {};
+  CARROS.forEach(function (c) { porId[c[0]] = { marca: c[1], nome: c[1] + ' ' + c[2], ec: c[3], eh: c[4], gc: c[5], gh: c[6], tanque: c[8] }; });
+  Object.keys(ESPECIAIS).forEach(function (k) { porId[k] = ESPECIAIS[k]; });
+
+  /* ---------- estado ---------- */
+  const CHAVE = 'cmb4';
+  const guarda = {
+    ler: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    gravar: function (k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    apagar: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  function perfilDe(id, extra) {
+    const c = porId[id];
+    return Object.assign({ carro: id, gc: txt(c.gc), gh: txt(c.gh), ec: txt(c.ec), eh: txt(c.eh), tanque: c.tanque ? String(c.tanque) : '', pbev: true }, extra);
+  }
+  function padrao() {
+    return {
+      v: 4,
+      precos: { g: '', e: '', a: '', p: '', em: 0 },
+      meu: perfilDe('tipico', { realG: '', realE: '', uso: 'misto' }),
+      alug: perfilDe('grupo', { kmEstrada: '240', kmCidade: '95', nivel: '1', regra: 'cheio', noTanque: 'nao-sei', faltam: '' }),
+      cfg: { mistura: 32, premium: 25, margem: 15, reserva: 15, empate: 3, misturaConferida: 0 }
+    };
+  }
+  function mesclar(base, obj) {
+    if (!obj || typeof obj !== 'object') return base;
+    Object.keys(base).forEach(function (k) {
+      const b = base[k], o = obj[k];
+      if (b && typeof b === 'object') mesclar(b, o);
+      else if (o !== undefined && typeof o === typeof b) base[k] = o;
+    });
+    return base;
+  }
+  function sanear(s) {
+    Object.keys(LIMITES).forEach(function (k) {
+      const L = LIMITES[k], v = s.cfg[k];
+      s.cfg[k] = typeof v === 'number' && isFinite(v) ? Math.min(L[1], Math.max(L[0], v)) : L[2];
+    });
+    if (!(s.cfg.misturaConferida >= 0)) s.cfg.misturaConferida = 0;
+    ['meu', 'alug'].forEach(function (a) {
+      const p = s[a];
+      if (p.carro !== 'outro' && !porId[p.carro]) p.carro = 'outro';
+      Object.keys(p).forEach(function (k) { if (typeof p[k] === 'string') p[k] = p[k].slice(0, 12); });
+    });
+    if (!(s.meu.uso in USO)) s.meu.uso = 'misto';
+    if (!(s.alug.nivel in FRACAO)) s.alug.nivel = '1';
+    if (s.alug.regra !== 'mesmo') s.alug.regra = 'cheio';
+    if (['nao-sei', 'g', 'e'].indexOf(s.alug.noTanque) < 0) s.alug.noTanque = 'nao-sei';
+    ['g', 'e', 'a', 'p'].forEach(function (k) { s.precos[k] = String(s.precos[k] || '').slice(0, 9); });
+    if (!(s.precos.em >= 0)) s.precos.em = 0;
+    s.v = 4;
+    return s;
+  }
+  function carregar() {
+    const s = padrao();
+    const bruto = guarda.ler(CHAVE);
+    if (bruto) { try { mesclar(s, JSON.parse(bruto)); } catch (e) {} return sanear(s); }
+    try {   // primeira abertura: aproveita o que a versão anterior guardou
+      const v3 = JSON.parse(guarda.ler('cmb3') || 'null');
+      if (v3) {
+        s.precos.g = String(v3.pg || ''); s.precos.e = String(v3.pe || ''); s.precos.em = Number(guarda.ler('cmb3_at')) || 0;
+        s.meu.realG = String(v3.kg || ''); s.meu.realE = String(v3.ke || '');
+      }
+    } catch (e) {}
+    return sanear(s);
+  }
+  function salvar() { guarda.gravar(CHAVE, JSON.stringify(S)); }
+
+  let S = carregar();
+  let aba = 'meu';   // sempre abre em "Meu carro"
+
+  const partes = function (caminho) { const p = caminho.split('.'); return [p[0] === '@' ? S[aba] : S[p[0]], p[1]]; };
+  const ler = function (caminho) { const p = partes(caminho); return p[0][p[1]]; };
+  const gravar = function (caminho, v) { const p = partes(caminho); p[0][p[1]] = v; };
+  const perfil = function (a) { const p = S[a]; return { gc: p.gc, gh: p.gh, ec: p.ec, eh: p.eh, tanque: p.tanque, pbev: p.pbev, realG: p.realG, realE: p.realE }; };
+
+  /* ---------- montagem da lista de carros ---------- */
+  function montarCarros() {
+    const sel = $('carro');
+    const grupo = function (rotulo, ids) {
+      const og = document.createElement('optgroup'); og.label = rotulo;
+      ids.forEach(function (id) { const o = document.createElement('option'); o.value = id; o.textContent = porId[id] ? porId[id].nome : 'Outro carro (digitar os números)'; og.appendChild(o); });
+      sel.appendChild(og);
+    };
+    grupo('Genérico', ['tipico', 'grupo', 'outro']);
+    grupo('Mais comuns em locadoras (econômicos)', LOCADORA);
+    const marcas = [];
+    CARROS.forEach(function (c) { if (marcas.indexOf(c[1]) < 0) marcas.push(c[1]); });
+    marcas.sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
+    marcas.forEach(function (m) { grupo(m, CARROS.filter(function (c) { return c[1] === m; }).map(function (c) { return c[0]; })); });
+  }
+  function aplicarCarro(id) {
+    const p = S[aba], c = porId[id];
+    p.carro = id;
+    if (c) {
+      p.gc = txt(c.gc); p.gh = txt(c.gh); p.ec = txt(c.ec); p.eh = txt(c.eh);
+      p.tanque = c.tanque ? String(c.tanque) : ''; p.pbev = true;
+      if (aba === 'meu') { p.realG = ''; p.realE = ''; }
+    } else { $('ajCarro').open = true; }
+    preencher();
+  }
+
+  /* ---------- campos <-> estado ---------- */
+  function preencher() {
+    document.querySelectorAll('[data-k]').forEach(function (el) {
+      const v = ler(el.dataset.k);
+      if (el.type === 'checkbox') el.checked = !!v; else el.value = v == null ? '' : v;
+    });
+    document.querySelectorAll('[data-cfg]').forEach(function (el) { el.value = txt(S.cfg[el.dataset.cfg]); });
+  }
+  document.addEventListener('input', function (ev) {
+    const el = ev.target, d = el.dataset || {};
+    if (d.k) {
+      gravar(d.k, el.type === 'checkbox' ? el.checked : el.value);
+      if (d.k.indexOf('precos.') === 0) S.precos.em = Date.now();
+      if (el.id === 'carro') aplicarCarro(el.value);
+      salvar(); render();
+    } else if (d.cfg) {
+      const L = LIMITES[d.cfg], v = parseFloat(String(el.value).replace(',', '.'));
+      if (isFinite(v) && v >= L[0] && v <= L[1]) {
+        S.cfg[d.cfg] = v;
+        if (d.cfg === 'mistura') S.cfg.misturaConferida = Date.now();
+        salvar(); render();
+      }
+    }
+  });
+  document.addEventListener('change', function (ev) {   // ao sair do campo de ajuste, mostra o valor que ficou valendo
+    const d = ev.target.dataset || {};
+    if (d.cfg) ev.target.value = txt(S.cfg[d.cfg]);
+  });
+  document.querySelectorAll('[data-uso]').forEach(function (b) {
+    b.addEventListener('click', function () { S.meu.uso = b.dataset.uso; salvar(); render(); });
+  });
+  $('tabMeu').addEventListener('click', function () { mudarAba('meu'); });
+  $('tabAlug').addEventListener('click', function () { mudarAba('alug'); });
+  function mudarAba(a) { aba = a; preencher(); render(); }
+
+  /* medição de consumo de tanque a tanque */
+  function medir(comb) {
+    const km = num($('mKm').value), l = num($('mL').value);
+    if (!km || !l) { $('mOut').textContent = 'Informe os km rodados e os litros que entraram.'; return; }
+    const v = km / l;
+    if (v < 3 || v > 40) { $('mOut').textContent = 'Deu ' + n(v) + ' km/L, fora do normal. Confira os números.'; return; }
+    S.meu[comb === 'g' ? 'realG' : 'realE'] = n(v, 1);
+    $('mOut').textContent = n(v) + ' km/L no ' + NOME[comb] + '. Já está valendo.';
+    salvar(); preencher(); render();
+  }
+  $('mG').addEventListener('click', function () { medir('g'); });
+  $('mE').addEventListener('click', function () { medir('e'); });
+
+  /* ---------- cópia de segurança ---------- */
+  const paraB64 = function (s) { return btoa(String.fromCharCode.apply(null, Array.from(new TextEncoder().encode(s)))); };
+  const deB64 = function (t) { return new TextDecoder().decode(Uint8Array.from(atob(t), function (ch) { return ch.charCodeAt(0); })); };
+  $('btnExport').addEventListener('click', function () {
+    const cod = 'CMB4.' + paraB64(JSON.stringify(S));
+    $('txtBackup').value = cod;
+    const ok = function () { $('bkOut').textContent = 'Código copiado. Cole no outro aparelho e toque em "Usar código colado".'; };
+    const manual = function () { $('txtBackup').focus(); $('txtBackup').select(); $('bkOut').textContent = 'Copie o código do campo acima.'; };
+    try { navigator.clipboard.writeText(cod).then(ok, manual); } catch (e) { manual(); }
+  });
+  $('btnImport').addEventListener('click', function () {
+    const t = $('txtBackup').value.trim();
+    try {
+      if (t.indexOf('CMB4.') !== 0) throw new Error('formato');
+      const o = JSON.parse(deB64(t.slice(5)));
+      if (!o || o.v !== 4) throw new Error('versão');
+      S = sanear(mesclar(padrao(), o)); salvar(); preencher(); render();
+      $('bkOut').textContent = 'Dados restaurados.';
+    } catch (e) { $('bkOut').textContent = 'Esse código não é válido. Copie de novo no outro aparelho, começando por CMB4.'; }
+  });
+  let armado = 0;
+  $('btnReset').addEventListener('click', function () {
+    const b = $('btnReset');
+    if (Date.now() - armado < 5000) {
+      armado = 0; guarda.apagar(CHAVE); guarda.apagar('cmb3'); guarda.apagar('cmb3_at');
+      S = padrao(); salvar(); preencher(); render();
+      b.textContent = 'Apagar tudo e voltar ao padrão'; $('bkOut').textContent = 'Tudo apagado.';
+    } else {
+      armado = Date.now(); b.textContent = 'Toque de novo para confirmar';
+      setTimeout(function () { if (armado) { armado = 0; b.textContent = 'Apagar tudo e voltar ao padrão'; } }, 5000);
+    }
+  });
+
+  /* ---------- desenho ---------- */
+  function faixa(a, b, f) { return Math.abs(b - a) < 0.03 * Math.max(a, b) ? '≈ ' + f((a + b) / 2) : f(a) + ' a ' + f(b); }
+  function fatos(lista) {
+    $('facts').innerHTML = '';
+    lista.forEach(function (x) {
+      const d = document.createElement('div'); d.className = 'fact' + (x.cls ? ' ' + x.cls : '');
+      const s = document.createElement('span'); s.textContent = x.k;
+      const b = document.createElement('b'); b.textContent = x.v;
+      d.appendChild(s); d.appendChild(b); $('facts').appendChild(d);
+    });
+  }
+  function heroi(o) {
+    $('hero').classList.toggle('empty', !!o.vazio);
+    $('lbl').textContent = o.lbl; $('ans').textContent = o.ans; $('ans').classList.toggle('amber', !!o.amarelo);
+    $('sub').textContent = o.sub || ''; fatos(o.fatos || []); $('base').textContent = o.base || '';
+    $('base').classList.toggle('hide', !o.base);
+  }
+
+  function renderPrecos() {
+    const g = num(S.precos.g), e = num(S.precos.e);
+    let t = g && e ? 'O etanol está a ' + n(e / g * 100, 0) + '% do preço da gasolina.' : 'Digite os dois preços.';
+    const estranho = ['g', 'e', 'a', 'p'].some(function (k) { const v = num(S.precos[k]); return v && (v < 2 || v > 15); });
+    if (estranho) t = 'Confira os preços: algum valor parece fora do normal.';
+    else if (S.precos.em && (g || e)) {
+      const d = new Date(S.precos.em), hoje = d.toDateString() === new Date().toDateString();
+      t += ' Preços de ' + d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + (hoje ? '.' : ': confira se ainda valem.');
+    }
+    $('meter').textContent = t;
+  }
+
+  function renderCarro() {
+    const p = S[aba], c = porId[p.carro];
+    const v = function (k) { return num(p[k]); };
+    const par = function (a, b) { return (a ? n(a) : '?') + ' / ' + (b ? n(b) : '?'); };
+    $('carroTitulo').textContent = aba === 'meu' ? 'Meu carro' : 'Carro alugado';
+    const partes = [];
+    if (v('gc') || v('gh')) partes.push('Gasolina ' + par(v('gc'), v('gh')));
+    if (v('ec') || v('eh')) partes.push('Etanol ' + par(v('ec'), v('eh')));
+    let t = partes.length ? partes.join(' · ') + ' km/L (cidade / estrada)' : 'Abra "Ajustar os números do carro" e digite o consumo.';
+    if (v('tanque')) t += ' · Tanque ' + n(v('tanque'), 0) + ' L';
+    else if (aba === 'alug') t += ' · Tanque: informe em "Ajustar os números"';
+    if (c) {
+      const mudou = ['gc', 'gh', 'ec', 'eh'].some(function (k) { return v(k) !== c[k]; }) || (c.tanque || null) !== (v('tanque') || null);
+      t += mudou ? ' · ajustado por você' : p.pbev ? ' · etiqueta do Inmetro' : '';
+    }
+    $('carroResumo').textContent = t;
+    document.querySelectorAll('[data-uso]').forEach(function (b) { b.classList.toggle('on', b.dataset.uso === S.meu.uso); b.setAttribute('aria-pressed', b.dataset.uso === S.meu.uso); });
+  }
+
+  function renderMeu() {
+    const r = Core.diaADia({ precos: S.precos, perfil: perfil('meu'), cidade: USO[S.meu.uso], cfg: S.cfg });
+    if (!r.melhor) {
+      heroi({ vazio: true, lbl: 'Compensa mais', ans: '—', sub: 'Digite o preço da gasolina e do etanol.' });
+      return;
+    }
+    const m = r.melhor, s2 = r.segundo;
+    let sub;
+    if (r.empate) {
+      sub = CURTO[m.id] + ' e ' + NOME[s2.id] + ' saem quase pelo mesmo custo por km (diferença de ' + n(r.diferenca * 100, 1) + '%).';
+      if ((m.id === 'g' && s2.id === 'e') || (m.id === 'e' && s2.id === 'g')) sub += ' Na dúvida, a gasolina dá mais autonomia.';
+    } else if (r.relacao) {
+      sub = 'O etanol está a ' + n(r.relacao * 100, 0) + '% do preço da gasolina. Neste carro ele compensa até ' + n(r.paridade * 100, 0) + '%, ou ' + BRL(r.etanolAte) + ' por litro.';
+    } else {
+      sub = CURTO[m.id] + ' custa ' + n(r.diferenca * 100, 0) + '% menos por km que ' + NOME[s2.id] + '.';
+    }
+    const fs = r.lista.map(function (x, i) {
+      return { k: CURTO[x.id] + ' · ' + n(x.km) + ' km/L', v: BRL(x.custo * 100) + ' / 100 km', cls: i === 0 && !r.empate ? 'win' : '' };
+    });
+    const bases = {
+      inmetro: 'Consumo da etiqueta do Inmetro, ajustado para a gasolina de hoje (' + txt(S.cfg.mistura) + '% de etanol).',
+      bomba: 'Consumo informado por você.',
+      medido: 'Consumo medido por você nos dois combustíveis.',
+      'medido-g': 'Gasolina medida por você; etanol estimado pela proporção da etiqueta.',
+      'medido-e': 'Etanol medido por você; gasolina estimada pela proporção da etiqueta.'
+    };
+    heroi({ lbl: 'Compensa mais', ans: r.empate ? 'TANTO FAZ' : TITULO[m.id], amarelo: r.empate, sub: sub, fatos: fs,
+      base: bases[r.base] + (r.estimado.length ? ' Parte dos números do carro foi estimada.' : '') +
+        (S.meu.carro === 'tipico' && r.base === 'inmetro' ? ' Escolha o seu carro na lista abaixo para afinar a conta.' : '') });
+  }
+
+  function renderAluguel() {
+    const a = S.alug;
+    const r = Core.aluguel({ precos: S.precos, perfil: perfil('alug'), kmCidade: a.kmCidade, kmEstrada: a.kmEstrada, nivel: a.nivel, regra: a.regra, noTanque: a.noTanque, cfg: S.cfg });
+    const passos = [], notas = [];
+    const L = function (v) { return n(v, 0) + ' L'; };
+    $('meioBox').classList.add('hide');
+
+    if (r.falta) {
+      heroi({ vazio: true, lbl: 'Na devolução, complete com', ans: '—', sub: 'Digite o preço da gasolina e do etanol.' });
+      passos.push('Digite os preços do posto para montar o plano.');
+    } else {
+      const fim = r.fFim, outro = r.outroFim, fs = [];
+      let sub = r.fimEmpate ? 'Os dois custam o mesmo por litro.' :
+        BRL(r.precos[fim]) + ' por litro, contra ' + BRL(r.precos[outro]) + '. No último abastecimento vale o preço por litro: você só repõe o que o carro gastou.';
+      if (r.semViagem) {
+        passos.push('Preencha os km da viagem para ver litros, custo e se cabe em um tanque.');
+      } else {
+        const km = n(r.D, 0) + ' km';
+        if (r.semTanque) fs.push({ k: 'Cabe em um tanque?', v: 'Informe o tanque', cls: 'warn' });
+        else if (r.status === 'folga') fs.push({ k: 'Cabe em um tanque?', v: 'Sim, com folga', cls: 'win' });
+        else if (r.status === 'apertado') fs.push({ k: 'Cabe em um tanque?', v: 'Sim, mas apertado', cls: 'warn' });
+        else fs.push({ k: 'Cabe em um tanque?', v: 'Não: ' + r.paradas + (r.paradas > 1 ? ' paradas' : ' parada'), cls: 'warn' });
+        fs.push({ k: 'Combustível a comprar', v: faixa(r.litros[0], r.litros[1], L) });
+        fs.push({ k: 'Custo estimado', v: faixa(r.custo[0], r.custo[1], BRL0) });
+        if (r.economia[1] >= 1) fs.push({ k: 'Economia contra usar só gasolina', v: faixa(r.economia[0], r.economia[1], BRL0), cls: 'win' });
+
+        if (r.semTanque) {
+          passos.push('Informe a capacidade do tanque no cartão do carro, logo abaixo, para eu checar se a viagem cabe em um tanque.');
+        } else if (r.status === 'folga') {
+          passos.push('Não abasteça durante a viagem: os ' + km + ' cabem no tanque com folga (autonomia segura de ≈ ' + n(r.autonomia, 0) + ' km, sem contar a reserva).');
+        } else if (r.status === 'apertado') {
+          passos.push('Deve caber em um tanque, mas sem folga: a autonomia segura é de ≈ ' + n(r.autonomia, 0) + ' km para ' + km + '. Acompanhe o ponteiro. Se ele chegar a 1/4 antes da volta, faça a parada abaixo.');
+        } else {
+          passos.push('Não cabe em um tanque: a autonomia segura é de ≈ ' + n(r.autonomia, 0) + ' km para ' + km + '. Planeje ' + (r.paradas > 1 ? r.paradas + ' paradas' : 'uma parada') + ' no meio da viagem.');
+        }
+        if (r.meio) {
+          const varias = r.paradas > 1, onde = varias ? 'Nas paradas do meio' : 'Na parada do meio';
+          if (r.fMeio === fim) passos.push(onde + ', abasteça com ' + NOME[r.fMeio] + (r.meioEmpate ? ': por km dá quase na mesma e por litro é o mais barato. ' : ', a melhor opção por km e por litro. ') + (r.alvo < 1 ? 'Não precisa encher: veja abaixo quanto colocar.' : 'Pode encher o tanque.'));
+          else passos.push(onde + ', abasteça com ' + NOME[r.fMeio] + ', que sai mais barata por km (' + BRL(r.custoKm[r.fMeio] * 100) + ' contra ' + BRL(r.custoKm[fim] * 100) + ' a cada 100 km). ' + (varias ? 'Na última delas, coloque' : 'Coloque') + ' só o necessário para terminar a viagem e deixe para completar com ' + NOME[fim] + ' no fim.');
+          // Viagem que não cabe: a conta já vem com os km que faltam na primeira parada. Viagem apertada: só se você digitar.
+          const padraoKm = r.status === 'nao' ? Math.round(r.meio.faltamKm) : 0;
+          $('faltam').placeholder = padraoKm ? String(padraoKm) : 'ex.: 120';
+          const faltam = num(a.faltam) || padraoKm;
+          const pm = Core.paradaMeio({ faltamKm: faltam, km: r.km[r.fMeio], margem: S.cfg.margem, tanque: r.tanque, reserva: S.cfg.reserva, mesmoDoFim: r.fMeio === fim, alvo: r.alvo });
+          $('meioOut').textContent = faltam <= 0 ? 'Se precisar parar, digite quantos km ainda faltam e veja quanto colocar.' :
+            pm.encher ? 'Para ' + n(faltam, 0) + ' km: encha o tanque com ' + NOME[r.fMeio] + '.' + (pm.maisParadas ? ' O que falta pede mais de um tanque, então refaça esta conta na próxima parada.' : '') :
+            'Para ' + n(faltam, 0) + ' km: coloque ≈ ' + L(pm.litros) + ' de ' + NOME[r.fMeio] + ' (' + BRL0(pm.litros * r.precos[r.fMeio]) + '), já com a folga.';
+          $('meioBox').classList.remove('hide');
+        }
+        const quanto = r.status === 'folga' || r.semTanque ? ' Devem entrar ' + faixa(r.fim[0], r.fim[1], L) + '.' : '';
+        passos.push('Antes de devolver, em um posto perto da agência, ' + (r.alvo < 1 ? 'complete até a mesma marca da retirada (' + FRACAO[a.nivel] + ')' : 'encha o tanque') +
+          ' com ' + (r.fimEmpate ? 'qualquer um dos dois' : NOME[fim]) + ' e pare no primeiro clique da bomba.' + quanto);
+        if (r.extra > 0.5) passos.push('Atenção: o carro saiu com ' + FRACAO[a.nivel] + ' e a regra é devolver cheio. Cerca de ' + L(r.extra) + ' desse abastecimento são combustível que você não gastou. Peça para completarem o tanque na retirada ou para registrarem a devolução no mesmo nível.');
+        passos.push('Guarde o cupom e fotografe o painel na retirada e na devolução.');
+        if (!r.noTanque.sabe) notas.push('Sem saber o que veio no tanque, a autonomia foi calculada pelo pior caso (etanol). A própria Localiza recomenda etanol aos clientes, então o carro pode vir com ele.');
+        notas.push('A conta inclui ' + txt(S.cfg.margem) + '% de folga no consumo (ar-condicionado, calor, ritmo de estrada) e deixa ' + txt(S.cfg.reserva) + '% do tanque como reserva.');
+        if (r.estimado.length) notas.push('Parte dos números do carro foi estimada.');
+      }
+      heroi({ lbl: r.alvo < 1 ? 'Na devolução, complete com' : 'Na devolução, encha com', ans: r.fimEmpate ? 'TANTO FAZ' : TITULO[fim], amarelo: r.fimEmpate, sub: sub, fatos: fs });
+    }
+    $('passos').innerHTML = '';
+    passos.forEach(function (t) { const li = document.createElement('li'); li.textContent = t; $('passos').appendChild(li); });
+    $('notasPlano').textContent = notas.join(' ');
+    $('notasPlano').classList.toggle('hide', !notas.length);
+  }
+
+  function renderAviso() {
+    const estado = Core.conferirMistura(Date.now(), S.cfg.misturaConferida), el = $('aviso');
+    el.classList.toggle('hide', !estado);
+    if (!estado) { el.innerHTML = ''; delete el.dataset.estado; return; }
+    if (el.dataset.estado === String(estado) + S.cfg.mistura) return;
+    el.dataset.estado = String(estado) + S.cfg.mistura;
+    el.innerHTML = '';
+    const p = document.createElement('div');
+    p.textContent = estado === 1 ?
+      'A regra temporária de 32% de etanol na gasolina venceu em janeiro de 2027. Qual é a mistura hoje? Uma busca por "percentual de etanol na gasolina" responde.' :
+      'Faz mais de seis meses que a mistura de etanol na gasolina foi conferida aqui (' + txt(S.cfg.mistura) + '%). Continua valendo?';
+    const row = document.createElement('div'); row.className = 'row';
+    const botao = function (rot, fn) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = rot; b.addEventListener('click', fn); row.appendChild(b); };
+    const fixar = function (v) { return function () { S.cfg.mistura = v; S.cfg.misturaConferida = Date.now(); salvar(); preencher(); render(); }; };
+    botao('Continua ' + txt(S.cfg.mistura) + '%', fixar(S.cfg.mistura));
+    [30, 32, 35].forEach(function (v) { if (v !== S.cfg.mistura) botao('É ' + v + '%', fixar(v)); });
+    botao('Outro valor', function () { $('cardAjustes').open = true; $('cMistura').focus(); $('cMistura').scrollIntoView({ block: 'center' }); });
+    el.appendChild(p); el.appendChild(row);
+  }
+
+  function renderAjustes() {
+    const f = Core.fatorMistura(S.cfg.mistura);
+    $('cfgNota').textContent = 'Com ' + txt(S.cfg.mistura) + '% de etanol, a conta tira ' + n((1 - f) * 100, 1) + '% dos km/L de gasolina da etiqueta do Inmetro (estimativa pela energia por litro). Mudou a regra da mistura? Troque o número aqui.';
+  }
+
+  function render() {
+    const meu = aba === 'meu';
+    $('tabMeu').classList.toggle('on', meu); $('tabAlug').classList.toggle('on', !meu);
+    $('tabMeu').setAttribute('aria-selected', String(meu)); $('tabAlug').setAttribute('aria-selected', String(!meu));
+    document.querySelectorAll('[data-aba]').forEach(function (el) { el.classList.toggle('hide', el.dataset.aba !== aba); });
+    renderPrecos(); renderCarro();
+    if (meu) renderMeu(); else renderAluguel();
+    renderAviso(); renderAjustes();
+  }
+
+  montarCarros(); preencher(); render();
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    try { navigator.serviceWorker.register('./sw.js').catch(function () {}); } catch (e) {}
+  }
+})();
 </script>
 </body>
 </html>

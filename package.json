@@ -1,0 +1,9 @@
+{
+  "name": "combustivel",
+  "private": true,
+  "description": "Qual combustível compensa no carro flex, no dia a dia e na devolução de carro alugado.",
+  "scripts": {
+    "test": "node --test tests/nucleo.test.mjs",
+    "test:tela": "node tests/tela.e2e.mjs"
+  }
+}

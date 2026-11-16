@@ -10,7 +10,7 @@ Publicado pelo GitHub Pages em `https://lugustavos.github.io/combustivel/`.
 ## Como usar
 
 1. Digite o preço da gasolina e do etanol. A resposta aparece logo abaixo.
-2. Escolha o carro na lista (80 versões com os números oficiais do Inmetro) ou digite os seus.
+2. Escolha o carro na lista (80 versões atuais da tabela de 2026 e 80 versões mais antigas das tabelas de 2011, 2014, 2015 e 2016, todas com números do Inmetro) ou digite os seus.
 3. Na aba **Aluguel**, informe os km de estrada e de cidade. O app diz se a viagem cabe em um tanque, o que
    pôr no meio (se precisar) e o que pôr antes de devolver.
 
@@ -76,6 +76,7 @@ estratégias possíveis em cada uma.
 | Km/L por versão (cidade e estrada, etanol e gasolina) | Inmetro, [Tabela PBE Veicular 2026](https://www.gov.br/inmetro/pt-br/assuntos/avaliacao-da-conformidade/programa-brasileiro-de-etiquetagem/tabelas-de-eficiencia-energetica/veiculos-automotivos-pbe-veicular), revisão de 27/02/2026. As 80 linhas foram lidas do PDF e conferidas uma segunda vez contra ele. |
 | Energia por litro de cada mistura | Oliveira et al., [Influencing Flex Fuel Car Customers at the Gas Station](https://pdf.blucher.com.br/engineeringproceedings/simea2025/PAP103.pdf), SIMEA 2025 (AEA), Tabela 1 |
 | Gasolina do ensaio com 22% de etanol | A própria ficha técnica dos fabricantes traz "Gasolina (E22)"; ver também a tabela acima |
+| Carros mais antigos (grupos "Marca · mais antigos") | Linhas das tabelas PBE Veicular do Inmetro de 2011, 2014, 2015 e 2016, lidas dos PDFs oficiais e conferidas por coerência (etanol rende menos que gasolina, proporção e MJ/km dentro de faixas). O nome de cada carro diz de qual tabela veio. Limites: a GM não aparece nas tabelas de 2011 a 2015 que li, então Celta, Corsa e Agile ficam de fora; o Sandero 1.6 8V só foi etiquetado em 2015 (etanol 7,3 / 8,7, gasolina 10,6 / 12,5), com o mesmo motor do modelo 2011/12. Carro com anos de uso rende diferente da etiqueta: se você mede o consumo real, digite em "Ajustar os números do carro", que vale mais que qualquer tabela. |
 | Mistura de 32% | Resolução CNPE nº 9/2026: vale de 01/08/2026 por 180 dias, prorrogável uma vez por igual período. A premium continua com 25%. [Comunicado da ANP](https://www.gov.br/anp/pt-br/canais_atendimento/imprensa/noticias-comunicados/e32-gasolina-com-32-de-etanol-passa-a-valer-temporariamente-a-partir-de-amanha-1-8) |
 | Aditivada | [ANP](https://www.gov.br/anp/pt-br/assuntos/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/gasolina): é a gasolina comum (ou premium) com detergente, sem especificação própria. Por isso o app usa o mesmo km/L da comum. |
 | Regras da Localiza | [Tanque cheio](https://www.localiza.com/brasil/pt-br/como-alugar-um-carro/tanque-cheio), [perguntas frequentes](https://cliente.localiza.com/faq/preciso-abastecer-o-carro-antes-de-devolver) e [contrato](https://www.localiza.com/Contratos/Brasil/pt/Contrato_Geral_Aluguel_de_Carros.pdf), consultados em novembro de 2026 |

@@ -56,7 +56,7 @@ try {
   igual(await txt(page, '#ans'), '—', 'abre sem resposta enquanto não há preço');
   igual(await page.$eval('#tabMeu', el => el.classList.contains('on')), true, 'abre na aba Meu carro');
   igual(await visivel(page, '#cardViagem'), false, 'cartões do aluguel ficam escondidos');
-  igual(await page.$$eval('#carro option', o => o.length), 80 + 3 + 8, 'lista de carros completa');
+  igual(await page.$$eval('#carro option', o => o.length), 80 + 80 + 3 + 8, 'lista de carros completa (80 de 2026 + 80 antigos + 3 genéricos + 8 repetidos em locadoras)');
   await page.type('#pg', '6,00'); await page.type('#pe', '3,60');      // digitação real de teclado
   igual(await txt(page, '#ans'), 'ETANOL', 'etanol a 60% vence');
   contem(await txt(page, '#sub'), 'compensa até 73%', 'mostra o ponto de virada do carro típico');
@@ -73,6 +73,11 @@ try {
   await foto(page, 'meu-claro');
 
   console.log('\n2. Carro, uso e medição');
+  await page.select('#carro', 'sandero-16-8v');
+  contem(await txt(page, '#carroResumo'), '10,6 / 12,5', 'carro antigo traz os números da tabela do Inmetro');
+  contem(await txt(page, '#carroResumo'), 'tabela de 2015', 'e diz de qual tabela vieram');
+  contem(await txt(page, '#carroResumo'), 'Tanque 50 L', 'com o tanque');
+  contem(await txt(page, '#base'), 'carro mais antigo', 'o resultado também avisa que é carro mais antigo');
   await page.select('#carro', 'hb20-10');
   contem(await txt(page, '#carroResumo'), '13,3 / 15,4', 'escolher o carro traz os números do Inmetro');
   contem(await txt(page, '#carroResumo'), 'Tanque 50 L', 'e o tanque');

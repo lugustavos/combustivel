@@ -355,10 +355,89 @@ const CARROS = [
 ["hrv-15","Honda","HR-V 1.5 (CVT)",8.8,9.9,12.5,13.9,1.63,null],
 ["hrv-turbo","Honda","HR-V 1.5 turbo (CVT)",8.1,9.1,11.5,12.9,1.78,null],
 ["wrv","Honda","WR-V 1.5 (CVT)",8.2,8.9,12.0,12.8,1.76,null],
-/* Carros antigos ou sem etiqueta oficial. Têm um 10º item {fonte, nota} e MJ/km nulo.
-   Os números são aproximados: o app avisa isso na tela e o consumo real medido vale mais. */
-["sandero-16-8v","Renault","Sandero Expression 1.6 8V (2011 a 2015)",7.3,8.7,10.6,12.5,null,50,
-  { fonte: "aproximado", nota: "O Sandero 1.6 8V dessa época não tem etiqueta oficial do Inmetro. Números do catálogo da versão 2015/2016, que usa o mesmo motor; sites divergem entre si." }]
+/* Carros mais antigos: linhas das tabelas PBE Veicular de 2011, 2014, 2015 e 2016 do Inmetro.
+   Têm um 10º item {fonte: ano da tabela, nota}. Nas tabelas de 2011 o MJ/km não existe (null).
+   Cada tabela do Inmetro pode ter sido medida com outra mistura na gasolina; o app trata todas como E22. */
+["uno-mille-fire","Fiat","Uno Mille Fire Economy 1.0 (tabela 2011)",8.9,10.7,12.7,15.6,null,null,{ fonte: "2011" }],
+["uno-mille-way","Fiat","Uno Mille Way Economy 1.0 (tabela 2011)",8.4,9.5,12.1,13.6,null,null,{ fonte: "2011" }],
+["novo-uno-vivace","Fiat","Novo Uno Vivace 1.0 (tabela 2014)",8.3,9.4,12.3,14.5,1.67,null,{ fonte: "2014" }],
+["novo-uno-way","Fiat","Novo Uno Way 1.0 (tabela 2014)",7.8,9.0,11.1,12.8,1.83,null,{ fonte: "2014" }],
+["novo-uno-14","Fiat","Novo Uno Economy 1.4 (tabela 2014)",8.7,10.4,12.5,15.2,1.59,null,{ fonte: "2014" }],
+["uno-6v-2016","Fiat","Uno Attractive/Way 1.0 6V (tabela 2016)",9.2,10.4,13.1,15.1,1.53,null,{ fonte: "2016" }],
+["palio-fire-2014","Fiat","Palio Fire 1.0 (tabela 2014)",8.8,10.3,12.3,15.0,1.6,null,{ fonte: "2014" }],
+["palio-elx-2011","Fiat","Palio ELX 1.0 (tabela 2011)",7.1,8.2,10.4,12.1,null,null,{ fonte: "2011" }],
+["palio-14-2011","Fiat","Palio Attractive 1.4 (tabela 2011)",7.2,8.5,10.6,12.5,null,null,{ fonte: "2011" }],
+["novo-palio-10","Fiat","Novo Palio Attractive 1.0 (tabela 2014)",7.3,9.4,10.8,13.6,1.84,null,{ fonte: "2014" }],
+["novo-palio-14","Fiat","Novo Palio Attractive 1.4 (tabela 2014)",7.4,9.3,10.8,13.5,1.84,null,{ fonte: "2014" }],
+["siena-fire-2011","Fiat","Siena Fire 1.0 (tabela 2011)",8.2,9.8,12.0,14.1,null,null,{ fonte: "2011" }],
+["siena-el-10","Fiat","Siena EL 1.0 (tabela 2014)",8.0,9.7,11.9,14.4,1.7,null,{ fonte: "2014" }],
+["siena-el-14","Fiat","Siena EL 1.4 (tabela 2014)",7.1,8.8,10.6,13.2,1.9,null,{ fonte: "2014" }],
+["grand-siena-14","Fiat","Grand Siena Attractive 1.4 (tabela 2014)",7.7,9.0,11.0,13.0,1.84,null,{ fonte: "2014" }],
+["strada-fire-2011","Fiat","Strada Fire 1.4 (tabela 2011)",7.3,8.2,10.6,12.0,null,null,{ fonte: "2011" }],
+["strada-working-14","Fiat","Strada Working 1.4 cabine dupla (tabela 2014)",7.5,7.7,10.6,11.0,2.0,null,{ fonte: "2014" }],
+["punto-14","Fiat","Punto Attractive 1.4 (tabela 2014)",7.4,8.5,10.4,12.3,1.93,null,{ fonte: "2014" }],
+["idea-16","Fiat","Idea Essence 1.6 (tabela 2014)",6.8,8.0,9.8,11.5,2.09,null,{ fonte: "2014" }],
+["gol-g4-2011","Volkswagen","Gol G4 1.0 (tabela 2011)",7.4,8.6,10.5,12.3,null,null,{ fonte: "2011" }],
+["gol-10-2011","Volkswagen","Gol / Voyage 1.0 (tabela 2011)",7.4,9.5,10.8,14.1,null,null,{ fonte: "2011" }],
+["gol-16-2011","Volkswagen","Gol / Voyage 1.6 (tabela 2011)",7.1,9.4,10.4,13.7,null,null,{ fonte: "2011" }],
+["gol-10-2014","Volkswagen","Gol / Voyage 1.0 (tabela 2014)",7.7,9.6,11.6,13.9,1.75,null,{ fonte: "2014" }],
+["gol-10-bm-2014","Volkswagen","Gol / Voyage 1.0 BlueMotion (tabela 2014)",8.0,10.1,11.8,14.9,1.68,null,{ fonte: "2014" }],
+["gol-16-2014","Volkswagen","Gol / Voyage 1.6 (tabela 2014)",7.3,9.4,10.7,13.7,1.84,null,{ fonte: "2014" }],
+["gol-10-2016","Volkswagen","Novo Gol 1.0 12V (tabela 2016)",8.8,10.3,12.9,14.5,1.58,null,{ fonte: "2016" }],
+["gol-16-2016","Volkswagen","Novo Gol 1.6 8V (tabela 2016)",7.6,9.2,11.0,13.1,1.83,null,{ fonte: "2016" }],
+["voyage-10-2016","Volkswagen","Novo Voyage 1.0 12V (tabela 2016)",8.7,10.5,12.9,15.4,1.56,null,{ fonte: "2016" }],
+["voyage-16-2016","Volkswagen","Novo Voyage 1.6 8V (tabela 2016)",7.5,9.4,11.1,13.3,1.81,null,{ fonte: "2016" }],
+["fox-10-2014","Volkswagen","Fox 1.0 BlueMotion (tabela 2014)",8.8,9.9,12.7,14.4,1.6,null,{ fonte: "2014" }],
+["fox-10-2016","Volkswagen","Novo Fox 1.0 12V (tabela 2016)",8.6,9.3,12.3,13.5,1.68,null,{ fonte: "2016" }],
+["fox-16-2016","Volkswagen","Fox 1.6 8V (tabela 2016)",7.8,9.7,11.6,13.9,1.74,null,{ fonte: "2016" }],
+["up-2014","Volkswagen","up! 1.0 (tabela 2014)",9.1,9.9,13.2,14.3,1.57,null,{ fonte: "2014" }],
+["polo-16-2014","Volkswagen","Polo 1.6 BlueMotion (tabela 2014)",7.4,10.5,10.8,15.0,1.76,null,{ fonte: "2014" }],
+["saveiro-16-2014","Volkswagen","Saveiro 1.6 (tabela 2014)",7.3,8.5,10.7,12.3,1.93,null,{ fonte: "2014" }],
+["classic-10","Chevrolet","Classic 1.0 (tabela 2016)",7.3,8.6,10.8,12.5,1.91,null,{ fonte: "2016" }],
+["onix-10-2016","Chevrolet","Onix / Prisma 1.0 (tabela 2016)",7.8,9.2,11.5,13.5,1.77,null,{ fonte: "2016" }],
+["onix-14-2016","Chevrolet","Onix / Prisma 1.4 manual (tabela 2016)",7.9,9.6,11.5,13.6,1.75,null,{ fonte: "2016" }],
+["onix-14-at-2016","Chevrolet","Onix / Prisma 1.4 automático (tabela 2016)",6.9,8.5,9.9,12.2,2.02,null,{ fonte: "2016" }],
+["onix-10-2017","Chevrolet","Novo Onix 1.0 (tabela 2016, modelo 2017)",8.8,10.5,12.9,15.3,1.56,null,{ fonte: "2016" }],
+["cobalt-14","Chevrolet","Cobalt 1.4 (tabela 2016, modelo 2017)",8.5,10.4,12.5,15.1,1.6,null,{ fonte: "2016" }],
+["spin-18","Chevrolet","Spin 1.8 manual (tabela 2016)",6.5,7.4,9.2,10.8,2.22,null,{ fonte: "2016" }],
+["montana-14","Chevrolet","Montana 1.4 (tabela 2016)",7.1,8.3,10.4,12.0,1.99,null,{ fonte: "2016" }],
+["ka-10-2011","Ford","Ka 1.0 (tabela 2011)",8.1,9.2,11.6,13.5,null,null,{ fonte: "2011" }],
+["ka-10-2014","Ford","Ka 1.0 12V (tabela 2014)",8.9,10.4,13.0,15.1,1.56,null,{ fonte: "2014" }],
+["ka-15-2014","Ford","Ka 1.5 (tabela 2014)",7.9,9.5,11.5,13.6,1.75,null,{ fonte: "2014" }],
+["fiesta-rocam-2011","Ford","Fiesta Rocam 1.6 (tabela 2011)",7.1,8.4,9.7,12.4,null,null,{ fonte: "2011" }],
+["fiesta-16-2016","Ford","New Fiesta 1.6 manual (tabela 2016)",8.0,9.9,11.7,14.1,1.71,null,{ fonte: "2016" }],
+["ecosport-16","Ford","EcoSport 1.6 (tabela 2016)",7.0,8.2,10.2,11.8,2.02,null,{ fonte: "2016" }],
+["ecosport-20","Ford","EcoSport 2.0 manual (tabela 2016)",6.5,8.1,9.0,11.7,2.17,null,{ fonte: "2016" }],
+["focus-16","Ford","Focus 1.6 manual (tabela 2014)",7.0,9.3,10.3,13.7,1.9,null,{ fonte: "2014" }],
+["hb20-10-2014","Hyundai","HB20 1.0 (tabela 2014)",7.6,9.8,11.5,14.5,1.74,null,{ fonte: "2014" }],
+["hb20-10-2016","Hyundai","HB20 1.0 (tabela 2016)",8.5,9.9,12.5,14.1,1.64,null,{ fonte: "2016" }],
+["hb20-16-2016","Hyundai","HB20 1.6 manual (tabela 2016)",8.1,9.9,11.6,13.8,1.72,null,{ fonte: "2016" }],
+["hb20s-10-2014","Hyundai","HB20S 1.0 (tabela 2014)",8.0,10.1,11.5,14.4,1.71,null,{ fonte: "2014" }],
+["fit-14","Honda","Fit 1.4 manual (tabela 2014)",8.1,9.2,11.8,13.3,1.75,null,{ fonte: "2014" }],
+["fit-15","Honda","Fit 1.5 manual (tabela 2016)",8.3,9.5,11.6,13.6,1.72,null,{ fonte: "2016" }],
+["city-15-old","Honda","City 1.5 manual (tabela 2014)",7.6,8.7,10.9,12.5,1.88,null,{ fonte: "2014" }],
+["city-15-2016","Honda","City 1.5 manual (tabela 2016)",8.6,10.3,12.4,14.6,1.61,null,{ fonte: "2016" }],
+["civic-18-mt","Honda","Civic 1.8 manual (tabela 2016)",7.2,9.2,10.9,13.5,1.86,null,{ fonte: "2016" }],
+["civic-18-at","Honda","Civic 1.8 automático (tabela 2016)",6.8,9.6,10.5,14.4,1.88,null,{ fonte: "2016" }],
+["civic-20-cvt","Honda","Civic 2.0 CVT (tabela 2016)",7.2,8.9,10.6,12.9,1.91,null,{ fonte: "2016" }],
+["etios-13","Toyota","Etios hatch 1.3 manual (tabela 2016)",8.6,9.8,12.6,14.2,1.63,null,{ fonte: "2016" }],
+["etios-15","Toyota","Etios hatch 1.5 manual (tabela 2016)",8.3,9.8,12.4,14.1,1.66,null,{ fonte: "2016" }],
+["etios-sedan-15","Toyota","Etios sedã 1.5 manual (tabela 2016)",8.5,10.3,12.5,15.0,1.6,null,{ fonte: "2016" }],
+["corolla-18-mt","Toyota","Corolla 1.8 manual (tabela 2016)",7.3,9.1,10.7,13.2,1.87,null,{ fonte: "2016" }],
+["corolla-18-cvt","Toyota","Corolla 1.8 CVT (tabela 2016)",7.8,9.2,11.4,13.2,1.78,null,{ fonte: "2016" }],
+["corolla-20-cvt","Toyota","Corolla 2.0 CVT (tabela 2016)",7.2,8.8,10.6,12.6,1.92,null,{ fonte: "2016" }],
+["march-10","Nissan","March 1.0 (tabela 2016)",8.8,10.4,12.9,15.0,1.57,null,{ fonte: "2016" }],
+["march-16","Nissan","March 1.6 manual (tabela 2016)",8.5,9.9,12.6,14.4,1.63,null,{ fonte: "2016" }],
+["versa-16-2016","Nissan","Versa 1.6 manual (tabela 2016)",8.4,10.0,12.6,14.4,1.63,null,{ fonte: "2016" }],
+["sandero-10-2014","Renault","Sandero 1.0 16V sem direção hidráulica (tabela 2014)",8.4,9.2,12.9,13.8,1.66,null,{ fonte: "2014" }],
+["sandero-10-hid-2014","Renault","Sandero / Logan 1.0 16V com direção hidráulica (tabela 2014)",8.1,8.6,12.4,12.8,1.75,null,{ fonte: "2014" }],
+["novo-sandero-10","Renault","Novo Sandero / Logan 1.0 16V (tabela 2015)",8.1,9.2,11.9,13.4,1.73,null,{ fonte: "2015" }],
+["sandero-16-8v","Renault","Sandero / Logan Expression 1.6 8V (tabela 2015)",7.3,8.7,10.6,12.5,1.91,50,{ fonte: "2015", nota: "Seu 2011/12 não aparece nas tabelas de 2011 a 2014. A Renault etiquetou o 1.6 8V na tabela de 2015, com o mesmo motor; em 2016 o número mudou pouco (etanol 7,5 / 8,7, gasolina 10,7 / 12,4)." }],
+["stepway-16","Renault","Sandero Stepway 1.6 8V manual (tabela 2015)",7.4,8.1,10.5,11.6,1.98,null,{ fonte: "2015" }],
+["duster-16-2014","Renault","Duster 1.6 (tabela 2014)",6.7,7.4,10.0,10.7,2.14,null,{ fonte: "2014" }],
+["207-14","Peugeot","207 1.4 (tabela 2014)",6.8,8.7,10.6,13.7,1.92,null,{ fonte: "2014" }],
+["208-15-2014","Peugeot","208 1.5 (tabela 2014)",8.0,9.6,11.6,14.3,1.72,null,{ fonte: "2014" }],
+["c3-15-2014","Citroën","C3 1.5 (tabela 2014)",7.5,9.3,11.9,14.7,1.74,null,{ fonte: "2014" }]
 ];
 </script>
 
@@ -598,7 +677,7 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
   CARROS.forEach(function (c) {
     const x = c[9] || {};
     porId[c[0]] = { marca: c[1], nome: c[1] + ' ' + c[2], ec: c[3], eh: c[4], gc: c[5], gh: c[6], tanque: c[8],
-      aprox: x.fonte === 'aproximado', nota: x.nota || '', antigo: !!c[9] };
+      fonte: x.fonte || '', nota: x.nota || '' };
   });
   Object.keys(ESPECIAIS).forEach(function (k) { porId[k] = ESPECIAIS[k]; });
 
@@ -690,7 +769,10 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
     marcas.sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
     marcas.forEach(function (m) { grupo(m, atuais.filter(function (c) { return c[1] === m; }).map(function (c) { return c[0]; })); });
     const antigos = CARROS.filter(function (c) { return c[9]; });
-    if (antigos.length) grupo('Mais antigos (números aproximados)', antigos.map(function (c) { return c[0]; }));
+    const marcasAnt = [];
+    antigos.forEach(function (c) { if (marcasAnt.indexOf(c[1]) < 0) marcasAnt.push(c[1]); });
+    marcasAnt.sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
+    marcasAnt.forEach(function (m) { grupo(m + ' · mais antigos', antigos.filter(function (c) { return c[1] === m; }).map(function (c) { return c[0]; })); });
   }
   function aplicarCarro(id) {
     const p = S[aba], c = porId[id];
@@ -827,7 +909,7 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
     else if (aba === 'alug') t += ' · Tanque: informe em "Ajustar os números"';
     if (c) {
       const mudou = ['gc', 'gh', 'ec', 'eh'].some(function (k) { return v(k) !== c[k]; }) || (c.tanque || null) !== (v('tanque') || null);
-      t += mudou ? ' · ajustado por você' : p.pbev ? (c.aprox ? ' · números aproximados, sem etiqueta oficial' : ' · etiqueta do Inmetro') : '';
+      t += mudou ? ' · ajustado por você' : p.pbev ? ' · etiqueta do Inmetro' + (c.fonte ? ' (tabela de ' + c.fonte + ')' : '') : '';
       if (c.nota && !mudou) t += '. ' + c.nota;
     }
     $('carroResumo').textContent = t;
@@ -855,9 +937,8 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
     });
     const cm = porId[S.meu.carro];
     const bases = {
-      inmetro: cm && cm.aprox
-        ? 'Consumo aproximado deste modelo (sem etiqueta oficial), ajustado para a gasolina de hoje (' + txt(S.cfg.mistura) + '% de etanol). Para ficar fiel ao seu carro, informe o consumo real em "Ajustar os números do carro".'
-        : 'Consumo da etiqueta do Inmetro, ajustado para a gasolina de hoje (' + txt(S.cfg.mistura) + '% de etanol).',
+      inmetro: 'Consumo da etiqueta do Inmetro' + (cm && cm.fonte ? ' (tabela de ' + cm.fonte + ', carro mais antigo)' : '') + ', ajustado para a gasolina de hoje (' + txt(S.cfg.mistura) + '% de etanol).' +
+        (cm && cm.fonte ? ' Carro com anos de uso rende diferente da etiqueta: se puder, informe o consumo real em "Ajustar os números do carro".' : ''),
       bomba: 'Consumo informado por você.',
       medido: 'Consumo medido por você nos dois combustíveis.',
       'medido-g': 'Gasolina medida por você; etanol estimado pela proporção da etiqueta.',

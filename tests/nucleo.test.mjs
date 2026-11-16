@@ -25,10 +25,13 @@ test('dados: tabela do Inmetro coerente', () => {
     assert.ok(marca && nome, id);
     for (const v of [ec, eh, gc, gh]) assert.ok(v > 5 && v < 20, id + ' km/L fora da faixa');
     assert.ok(ec < gc && eh < gh, id + ' etanol deveria render menos');
-    for (const r of [ec / gc, eh / gh]) assert.ok(r > 0.64 && r < 0.78, id + ' proporção etanol/gasolina estranha: ' + r);
-    if (extra) {   // carro antigo ou sem etiqueta oficial: sem MJ/km, mas precisa dizer de onde vem
-      assert.equal(mj, null, id + ' antigo não tem MJ/km');
-      assert.ok(['aproximado'].includes(extra.fonte) && extra.nota.length > 20, id + ' fonte e nota');
+    if (!extra) for (const r of [ec / gc, eh / gh]) assert.ok(r > 0.64 && r < 0.78, id + ' proporção etanol/gasolina estranha: ' + r);
+    const mjOk = (a, b, c, d) => { for (const k of [a, b]) assert.ok(k > 19.8 && k < 22.8, id + ' gasolina × MJ/km: ' + k); for (const k of [c, d]) assert.ok(k > 13.8 && k < 15.9, id + ' etanol × MJ/km: ' + k); };
+    if (extra) {   // carro antigo: precisa dizer de qual tabela veio; sem MJ/km só nas tabelas de 2011
+      assert.ok(['2011', '2014', '2015', '2016'].includes(extra.fonte), id + ' fonte');
+      assert.ok(extra.fonte === '2011' ? mj === null : mj > 1.3 && mj < 2.6, id + ' MJ/km e tabela');
+      for (const r of [ec / gc, eh / gh]) assert.ok(r > 0.60 && r < 0.80, id + ' proporção (antigo): ' + r);
+      if (mj !== null) mjOk(h(gc, gh) * mj, h(gc, gh) * mj, h(ec, eh) * mj, h(ec, eh) * mj);
     } else {
       // km/L combinado × MJ/km fica numa faixa estreita em toda a tabela: pega erro de digitação grosseiro
       assert.ok(h(gc, gh) * mj > 20.2 && h(gc, gh) * mj < 22.2, id + ' gasolina × MJ/km');

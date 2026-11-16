@@ -849,7 +849,8 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
       'medido-e': 'Etanol medido por você; gasolina estimada pela proporção da etiqueta.'
     };
     heroi({ lbl: 'Compensa mais', ans: r.empate ? 'TANTO FAZ' : TITULO[m.id], amarelo: r.empate, sub: sub, fatos: fs,
-      base: bases[r.base] + (r.estimado.length ? ' Parte dos números do carro foi estimada.' : '') });
+      base: bases[r.base] + (r.estimado.length ? ' Parte dos números do carro foi estimada.' : '') +
+        (S.meu.carro === 'tipico' && r.base === 'inmetro' ? ' Escolha o seu carro na lista abaixo para afinar a conta.' : '') });
   }
 
   function renderAluguel() {
@@ -906,7 +907,7 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
           ' com ' + (r.fimEmpate ? 'qualquer um dos dois' : NOME[fim]) + ' e pare no primeiro clique da bomba.' + quanto);
         if (r.extra > 0.5) passos.push('Atenção: o carro saiu com ' + FRACAO[a.nivel] + ' e a regra é devolver cheio. Cerca de ' + L(r.extra) + ' desse abastecimento são combustível que você não gastou. Peça para completarem o tanque na retirada ou para registrarem a devolução no mesmo nível.');
         passos.push('Guarde o cupom e fotografe o painel na retirada e na devolução.');
-        if (!r.noTanque.sabe) notas.push('Sem saber o que veio no tanque, a autonomia foi calculada pelo pior caso (etanol). É comum o carro vir com etanol, que a própria Localiza recomenda aos clientes.');
+        if (!r.noTanque.sabe) notas.push('Sem saber o que veio no tanque, a autonomia foi calculada pelo pior caso (etanol). A própria Localiza recomenda etanol aos clientes, então o carro pode vir com ele.');
         notas.push('A conta inclui ' + txt(S.cfg.margem) + '% de folga no consumo (ar-condicionado, calor, ritmo de estrada) e deixa ' + txt(S.cfg.reserva) + '% do tanque como reserva.');
         if (r.estimado.length) notas.push('Parte dos números do carro foi estimada.');
       }
@@ -940,7 +941,7 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
 
   function renderAjustes() {
     const f = Core.fatorMistura(S.cfg.mistura);
-    $('cfgNota').textContent = 'Com ' + txt(S.cfg.mistura) + '% de etanol, a gasolina rende ' + n((1 - f) * 100, 1) + '% a menos de km/L que na etiqueta do Inmetro. Mudou a regra da mistura? Troque o número aqui.';
+    $('cfgNota').textContent = 'Com ' + txt(S.cfg.mistura) + '% de etanol, a conta tira ' + n((1 - f) * 100, 1) + '% dos km/L de gasolina da etiqueta do Inmetro (estimativa pela energia por litro). Mudou a regra da mistura? Troque o número aqui.';
   }
 
   function render() {

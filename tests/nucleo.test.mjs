@@ -18,17 +18,22 @@ const carro = id => { const c = CARROS.find(x => x[0] === id); return { ec: c[3]
 const F32 = Core.fatorMistura(32);
 
 test('dados: tabela do Inmetro coerente', () => {
-  assert.equal(CARROS.length, 80);
+  assert.equal(CARROS.filter(c => !c[9]).length, 80, 'linhas da tabela PBEV 2026');
   assert.equal(new Set(CARROS.map(c => c[0])).size, CARROS.length, 'ids repetidos');
   const h = (c, e) => 1 / (0.55 / c + 0.45 / e);
-  for (const [id, marca, nome, ec, eh, gc, gh, mj, tanque] of CARROS) {
+  for (const [id, marca, nome, ec, eh, gc, gh, mj, tanque, extra] of CARROS) {
     assert.ok(marca && nome, id);
     for (const v of [ec, eh, gc, gh]) assert.ok(v > 5 && v < 20, id + ' km/L fora da faixa');
     assert.ok(ec < gc && eh < gh, id + ' etanol deveria render menos');
     for (const r of [ec / gc, eh / gh]) assert.ok(r > 0.64 && r < 0.78, id + ' proporção etanol/gasolina estranha: ' + r);
-    // km/L combinado × MJ/km fica numa faixa estreita em toda a tabela: pega erro de digitação grosseiro
-    assert.ok(h(gc, gh) * mj > 20.2 && h(gc, gh) * mj < 22.2, id + ' gasolina × MJ/km');
-    assert.ok(h(ec, eh) * mj > 14.0 && h(ec, eh) * mj < 15.6, id + ' etanol × MJ/km');
+    if (extra) {   // carro antigo ou sem etiqueta oficial: sem MJ/km, mas precisa dizer de onde vem
+      assert.equal(mj, null, id + ' antigo não tem MJ/km');
+      assert.ok(['aproximado'].includes(extra.fonte) && extra.nota.length > 20, id + ' fonte e nota');
+    } else {
+      // km/L combinado × MJ/km fica numa faixa estreita em toda a tabela: pega erro de digitação grosseiro
+      assert.ok(h(gc, gh) * mj > 20.2 && h(gc, gh) * mj < 22.2, id + ' gasolina × MJ/km');
+      assert.ok(h(ec, eh) * mj > 14.0 && h(ec, eh) * mj < 15.6, id + ' etanol × MJ/km');
+    }
     assert.ok(tanque === null || (tanque >= 30 && tanque <= 80), id + ' tanque');
   }
 });

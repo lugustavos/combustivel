@@ -263,7 +263,7 @@ a{color:var(--accent)}
     <li><b>Empate:</b> diferença pequena entra como "tanto faz", porque fica abaixo do erro das estimativas.</li>
   </ul>
   <p class="small">Fontes: Inmetro, Tabela PBEV 2026 (revisão de 27/02/2026); ANP e CNPE (gasolina com 32% de etanol desde 01/08/2026, regra temporária); AEA, SIMEA 2025 (energia por litro de cada mistura). Detalhes em <a href="https://github.com/lugustavos/combustivel#readme" target="_blank" rel="noopener">github.com/lugustavos/combustivel</a>.</p>
-  <p class="small" id="versao">Versão 4.0</p>
+  <p class="small" id="versao">Versão 4.1</p>
 </div>
 </details>
 
@@ -354,7 +354,11 @@ const CARROS = [
 ["city-hatch","Honda","City hatch 1.5 (CVT)",9.2,10.5,13.2,15.0,1.53,null],
 ["hrv-15","Honda","HR-V 1.5 (CVT)",8.8,9.9,12.5,13.9,1.63,null],
 ["hrv-turbo","Honda","HR-V 1.5 turbo (CVT)",8.1,9.1,11.5,12.9,1.78,null],
-["wrv","Honda","WR-V 1.5 (CVT)",8.2,8.9,12.0,12.8,1.76,null]
+["wrv","Honda","WR-V 1.5 (CVT)",8.2,8.9,12.0,12.8,1.76,null],
+/* Carros antigos ou sem etiqueta oficial. Têm um 10º item {fonte, nota} e MJ/km nulo.
+   Os números são aproximados: o app avisa isso na tela e o consumo real medido vale mais. */
+["sandero-16-8v","Renault","Sandero Expression 1.6 8V (2011 a 2015)",7.3,8.7,10.6,12.5,null,50,
+  { fonte: "aproximado", nota: "O Sandero 1.6 8V dessa época não tem etiqueta oficial do Inmetro. Números do catálogo da versão 2015/2016, que usa o mesmo motor; sites divergem entre si." }]
 ];
 </script>
 
@@ -591,7 +595,11 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
   };
   const LOCADORA = ['mobi-like', 'kwid', 'argo-10', 'hb20-10', 'onix-10', 'polo-mpi', 'c3-10', '208-10'];
   const porId = {};
-  CARROS.forEach(function (c) { porId[c[0]] = { marca: c[1], nome: c[1] + ' ' + c[2], ec: c[3], eh: c[4], gc: c[5], gh: c[6], tanque: c[8] }; });
+  CARROS.forEach(function (c) {
+    const x = c[9] || {};
+    porId[c[0]] = { marca: c[1], nome: c[1] + ' ' + c[2], ec: c[3], eh: c[4], gc: c[5], gh: c[6], tanque: c[8],
+      aprox: x.fonte === 'aproximado', nota: x.nota || '', antigo: !!c[9] };
+  });
   Object.keys(ESPECIAIS).forEach(function (k) { porId[k] = ESPECIAIS[k]; });
 
   /* ---------- estado ---------- */
@@ -676,10 +684,13 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
     };
     grupo('Genérico', ['tipico', 'grupo', 'outro']);
     grupo('Mais comuns em locadoras (econômicos)', LOCADORA);
+    const atuais = CARROS.filter(function (c) { return !c[9]; });
     const marcas = [];
-    CARROS.forEach(function (c) { if (marcas.indexOf(c[1]) < 0) marcas.push(c[1]); });
+    atuais.forEach(function (c) { if (marcas.indexOf(c[1]) < 0) marcas.push(c[1]); });
     marcas.sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
-    marcas.forEach(function (m) { grupo(m, CARROS.filter(function (c) { return c[1] === m; }).map(function (c) { return c[0]; })); });
+    marcas.forEach(function (m) { grupo(m, atuais.filter(function (c) { return c[1] === m; }).map(function (c) { return c[0]; })); });
+    const antigos = CARROS.filter(function (c) { return c[9]; });
+    if (antigos.length) grupo('Mais antigos (números aproximados)', antigos.map(function (c) { return c[0]; }));
   }
   function aplicarCarro(id) {
     const p = S[aba], c = porId[id];
@@ -816,7 +827,8 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
     else if (aba === 'alug') t += ' · Tanque: informe em "Ajustar os números"';
     if (c) {
       const mudou = ['gc', 'gh', 'ec', 'eh'].some(function (k) { return v(k) !== c[k]; }) || (c.tanque || null) !== (v('tanque') || null);
-      t += mudou ? ' · ajustado por você' : p.pbev ? ' · etiqueta do Inmetro' : '';
+      t += mudou ? ' · ajustado por você' : p.pbev ? (c.aprox ? ' · números aproximados, sem etiqueta oficial' : ' · etiqueta do Inmetro') : '';
+      if (c.nota && !mudou) t += '. ' + c.nota;
     }
     $('carroResumo').textContent = t;
     document.querySelectorAll('[data-uso]').forEach(function (b) { b.classList.toggle('on', b.dataset.uso === S.meu.uso); b.setAttribute('aria-pressed', b.dataset.uso === S.meu.uso); });
@@ -841,8 +853,11 @@ if (typeof globalThis !== 'undefined') globalThis.Core = Core;
     const fs = r.lista.map(function (x, i) {
       return { k: CURTO[x.id] + ' · ' + n(x.km) + ' km/L', v: BRL(x.custo * 100) + ' / 100 km', cls: i === 0 && !r.empate ? 'win' : '' };
     });
+    const cm = porId[S.meu.carro];
     const bases = {
-      inmetro: 'Consumo da etiqueta do Inmetro, ajustado para a gasolina de hoje (' + txt(S.cfg.mistura) + '% de etanol).',
+      inmetro: cm && cm.aprox
+        ? 'Consumo aproximado deste modelo (sem etiqueta oficial), ajustado para a gasolina de hoje (' + txt(S.cfg.mistura) + '% de etanol). Para ficar fiel ao seu carro, informe o consumo real em "Ajustar os números do carro".'
+        : 'Consumo da etiqueta do Inmetro, ajustado para a gasolina de hoje (' + txt(S.cfg.mistura) + '% de etanol).',
       bomba: 'Consumo informado por você.',
       medido: 'Consumo medido por você nos dois combustíveis.',
       'medido-g': 'Gasolina medida por você; etanol estimado pela proporção da etiqueta.',

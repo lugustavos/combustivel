@@ -10,7 +10,7 @@ Publicado pelo GitHub Pages em `https://lugustavos.github.io/combustivel/`.
 ## Como usar
 
 1. Digite o preço da gasolina e do etanol. A resposta aparece logo abaixo.
-2. Escolha o carro na lista (80 versões com os números oficiais do Inmetro) ou digite os seus.
+2. Escolha o carro na lista (80 versões com os números oficiais do Inmetro, mais alguns carros antigos com números aproximados) ou digite os seus.
 3. Na aba **Aluguel**, informe os km de estrada e de cidade. O app diz se a viagem cabe em um tanque, o que
    pôr no meio (se precisar) e o que pôr antes de devolver.
 
@@ -76,6 +76,7 @@ estratégias possíveis em cada uma.
 | Km/L por versão (cidade e estrada, etanol e gasolina) | Inmetro, [Tabela PBE Veicular 2026](https://www.gov.br/inmetro/pt-br/assuntos/avaliacao-da-conformidade/programa-brasileiro-de-etiquetagem/tabelas-de-eficiencia-energetica/veiculos-automotivos-pbe-veicular), revisão de 27/02/2026. As 80 linhas foram lidas do PDF e conferidas uma segunda vez contra ele. |
 | Energia por litro de cada mistura | Oliveira et al., [Influencing Flex Fuel Car Customers at the Gas Station](https://pdf.blucher.com.br/engineeringproceedings/simea2025/PAP103.pdf), SIMEA 2025 (AEA), Tabela 1 |
 | Gasolina do ensaio com 22% de etanol | A própria ficha técnica dos fabricantes traz "Gasolina (E22)"; ver também a tabela acima |
+| Carros antigos (grupo "Mais antigos") | Sem etiqueta oficial na época, então os números são aproximados e marcados assim na tela. Hoje só o Sandero Expression 1.6 8V: o Inmetro não etiquetou essa versão e os sites divergem (de 6,6 a 7,7 km/L no etanol em cidade). Uso os números do catálogo 2015/2016 do mesmo motor (etanol 7,3 / 8,7 e gasolina 10,6 / 12,5). Se você mede o consumo real, digite em "Ajustar os números do carro": vale mais que qualquer tabela. |
 | Mistura de 32% | Resolução CNPE nº 9/2026: vale de 01/08/2026 por 180 dias, prorrogável uma vez por igual período. A premium continua com 25%. [Comunicado da ANP](https://www.gov.br/anp/pt-br/canais_atendimento/imprensa/noticias-comunicados/e32-gasolina-com-32-de-etanol-passa-a-valer-temporariamente-a-partir-de-amanha-1-8) |
 | Aditivada | [ANP](https://www.gov.br/anp/pt-br/assuntos/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/gasolina): é a gasolina comum (ou premium) com detergente, sem especificação própria. Por isso o app usa o mesmo km/L da comum. |
 | Regras da Localiza | [Tanque cheio](https://www.localiza.com/brasil/pt-br/como-alugar-um-carro/tanque-cheio), [perguntas frequentes](https://cliente.localiza.com/faq/preciso-abastecer-o-carro-antes-de-devolver) e [contrato](https://www.localiza.com/Contratos/Brasil/pt/Contrato_Geral_Aluguel_de_Carros.pdf), consultados em novembro de 2026 |

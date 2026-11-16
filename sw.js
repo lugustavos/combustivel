@@ -1,7 +1,7 @@
 /* Service worker: deixa o app abrir sem internet.
    Estratégia: rede primeiro, para pegar atualizações; se a rede falhar ou demorar mais de 3 s, usa a cópia guardada.
    Ao publicar uma versão nova não é preciso mexer aqui: a cópia guardada é trocada a cada abertura com internet. */
-const CACHE = 'combustivel-v4';
+const CACHE = 'combustivel-v4-1';
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

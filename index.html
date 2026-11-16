@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Combustível">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Combustível</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1f1a;--card:#162a23;--line:#27443a;--text:#f1f8f4;--muted:#9db3a8;--green:#7ee8a8;--amber:#f5cf72;--red:#ff9d8f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;padding:calc(14px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))}
+main{max-width:480px;margin:auto}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:#0b1713;border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin-bottom:14px}
+.seg button{border:0;background:none;color:var(--muted);font:inherit;font-weight:700;padding:11px 6px;border-radius:10px}
+.seg button.on{background:#25463a;color:var(--text)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
+.card h2{margin:0 0 12px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pf label{display:block;font-size:14px;color:var(--muted);margin-bottom:6px}
+.pf .in{display:flex;align-items:center;background:#0b1713;border:2px solid #36584b;border-radius:16px;padding:0 12px}
+.pf .in:focus-within{border-color:var(--green)}
+.pf .in span{color:var(--muted);font-weight:700;margin-right:6px}
+.pf input{width:100%;min-width:0;background:none;border:0;outline:0;color:var(--text);font:800 28px system-ui;padding:12px 0}
+.meter{margin-top:14px;font-size:14px;color:var(--muted);text-align:center}
+.meter b{color:var(--text)}
+.hero{text-align:center;padding:24px 18px}
+.hero .lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hero .ans{font-size:46px;font-weight:900;line-height:1.1;margin:6px 0;color:var(--green)}
+.hero .ans.amber{color:var(--amber)}
+.hero .sub{color:var(--text);font-size:16px}
+.hero.empty .ans{font-size:22px;color:var(--muted);font-weight:700}
+.facts{display:grid;gap:8px;margin-top:16px;text-align:left}
+.fact{display:flex;justify-content:space-between;gap:12px;background:#0b1713;border-radius:12px;padding:11px 13px;font-size:15px}
+.fact span:first-child{color:var(--muted)}.fact b{white-space:nowrap}
+.fact.win b{color:var(--green)}
+.steps{margin:0;padding-left:20px;color:var(--text);font-size:15px;line-height:1.55}
+.steps li{margin:6px 0}
+.small{font-size:13px;color:var(--muted);line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+.f input{width:100%;background:#0b1713;border:1px solid #36584b;border-radius:12px;color:var(--text);font:inherit;font-weight:700;padding:11px;outline:0}
+.f input:focus{border-color:var(--green)}
+.link{display:block;text-align:center;text-decoration:none;color:var(--text);background:#25463a;border-radius:14px;padding:14px;font-weight:700;margin-bottom:14px}
+.warn{border-left:4px solid var(--amber);background:#2b2818;border-radius:10px;padding:10px 12px;font-size:14px;color:#f6e8bd;margin-top:14px;line-height:1.5}
+details summary{color:var(--green);font-weight:700;font-size:14px;cursor:pointer;margin-top:14px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<div class="seg" role="tablist">
+  <button id="tabDaily" class="on" type="button">Meu carro</button>
+  <button id="tabRent" type="button">Aluguel</button>
+</div>
+
+<a class="link" id="maps" href="https://www.google.com/maps/search/posto+de+combust%C3%ADvel" target="_blank" rel="noopener">Ver postos perto de mim</a>
+
+<section class="card">
+  <h2>Preço no posto (por litro)</h2>
+  <div class="prices">
+    <div class="pf"><label for="pg">Gasolina</label><div class="in"><span>R$</span><input id="pg" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+    <div class="pf"><label for="pe">Etanol</label><div class="in"><span>R$</span><input id="pe" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+  </div>
+  <div class="meter" id="meter">Digite os dois preços.</div>
+  <div class="small" id="age" style="text-align:center;margin-top:4px"></div>
+</section>
+
+<section class="card hero empty" id="hero">
+  <div class="lbl" id="lbl">Abasteça com</div>
+  <div class="ans" id="ans">—</div>
+  <div class="sub" id="sub"></div>
+  <div class="facts" id="facts"></div>
+</section>
+
+<section class="card hide" id="rentBox">
+  <h2>Sua viagem</h2>
+  <div class="row2">
+    <div class="f"><label for="dist">Distância total (km)</label><input id="dist" inputmode="decimal" value="335"></div>
+    <div class="f"><label for="kml">Consumo do carro (km/L)</label><input id="kml" inputmode="decimal" value="12"></div>
+  </div>
+  <p class="small" style="margin:12px 0 4px"><b>Como fazer:</b></p>
+  <ol class="steps">
+    <li>Na retirada, confira o tanque cheio e fotografe o painel.</li>
+    <li>Não abasteça durante a viagem se o ponteiro não passar de 1/4.</li>
+    <li>Antes de devolver, encha com o combustível indicado acima, até o primeiro clique da bomba. Guarde o recibo.</li>
+  </ol>
+  <div class="warn">Só use etanol se o carro for flex (veja a tampa do tanque ou o manual). Confirme no contrato a regra de devolução.</div>
+</section>
+
+<section class="card" id="dailyBox">
+  <h2>Como decidir</h2>
+  <p class="small" style="margin:0">Etanol rende menos km por litro, então só compensa se for bem mais barato. Com a gasolina atual (32% de etanol), o ponto de virada fica perto de <b>75%</b> do preço da gasolina. Se o seu carro for diferente, ajuste:</p>
+  <details>
+    <summary>Ajustar para o meu carro</summary>
+    <div class="row2" style="margin-top:10px">
+      <div class="f"><label for="kg">Gasolina (km/L)</label><input id="kg" inputmode="decimal" placeholder="ex.: 12"></div>
+      <div class="f"><label for="ke">Etanol (km/L)</label><input id="ke" inputmode="decimal" placeholder="ex.: 8,6"></div>
+    </div>
+    <p class="small">Preencha os dois para usar o ponto de virada do seu carro (km/L do etanol ÷ km/L da gasolina). Vazio = 75%.</p>
+  </details>
+</section>
+
+<p class="small" style="text-align:center">Gasolina comum com 32% de etanol desde 01/08/2026 (regra temporária de 180 dias). Os dados ficam só neste aparelho.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const num=id=>{const n=parseFloat(String($(id).value).replace(',','.'));return isFinite(n)&&n>0?n:null};
+const BRL=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const F1=v=>v.toLocaleString('pt-BR',{maximumFractionDigits:1});
+let mode='daily';
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+function setMode(m){
+  mode=m;
+  $('tabRent').classList.toggle('on',m==='rent');$('tabDaily').classList.toggle('on',m==='daily');
+  $('rentBox').classList.toggle('hide',m!=='rent');$('dailyBox').classList.toggle('hide',m!=='daily');
+  calc();
+}
+function setHero(empty,lbl,ans,amber,sub,facts){
+  $('hero').classList.toggle('empty',empty);$('lbl').textContent=lbl;
+  $('ans').textContent=ans;$('ans').classList.toggle('amber',!!amber);
+  $('sub').textContent=sub||'';
+  $('facts').innerHTML=(facts||[]).map(f=>`<div class="fact${f.win?' win':''}"><span>${f.k}</span><b>${f.v}</b></div>`).join('');
+}
+function calc(){
+  const g=num('pg'),e=num('pe');
+  if(g&&e)$('meter').innerHTML=`Etanol está a <b>${(e/g*100).toFixed(0)}%</b> do preço da gasolina`;
+  else $('meter').textContent='Digite os dois preços.';
+  const st=ls('cmb3_at');
+  if(st&&(g||e)){const d=new Date(Number(st));$('age').textContent='Preços de '+d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+(d.toDateString()!==new Date().toDateString()?' (confira se ainda valem)':'')}else $('age').textContent='';
+
+  if(!g||!e){setHero(true,mode==='rent'?'Abasteça com':'Compensa mais','—',false,'Preencha gasolina e etanol acima.',[]);save();return}
+
+  if(mode==='rent'){
+    // Devolução com tanque cheio: você repõe os litros que o carro gastou, então vale o menor preço por litro.
+    const d=num('dist'),k=num('kml');
+    const best=e<g?'ETANOL':'GASOLINA',bp=Math.min(e,g),wp=Math.max(e,g);
+    let facts=[],sub=`${BRL(bp)} por litro, contra ${BRL(wp)}.`;
+    if(d&&k){
+      const L=d/k;
+      facts=[{k:'Litros para repor (estimativa)',v:'≈ '+F1(L)+' L'},
+             {k:best==='ETANOL'?'Etanol':'Gasolina',v:BRL(L*bp),win:true},
+             {k:best==='ETANOL'?'Gasolina':'Etanol',v:BRL(L*wp)},
+             {k:'Você economiza',v:BRL(L*(wp-bp)),win:true}];
+    }
+    setHero(false,'Na devolução, encha com',best,false,sub,facts);
+  }else{
+    const kg=num('kg'),ke=num('ke');
+    const be=(kg&&ke)?ke/kg*100:75,rel=e/g*100;
+    const diff=rel-be;
+    let ans,amber=false,sub;
+    if(Math.abs(diff)<2){ans='TANTO FAZ';amber=true;sub=`Etanol a ${rel.toFixed(0)}% e o ponto de virada é ${be.toFixed(0)}%: praticamente empate.`}
+    else if(diff<0){ans='ETANOL';sub=`Etanol está a ${rel.toFixed(0)}% e compensa até ${be.toFixed(0)}%.`}
+    else{ans='GASOLINA';sub=`Etanol está a ${rel.toFixed(0)}%, acima do ponto de virada de ${be.toFixed(0)}%.`}
+    const facts=[];
+    if(kg&&ke){facts.push({k:'Gasolina por km',v:BRL(g/kg),win:g/kg<e/ke},{k:'Etanol por km',v:BRL(e/ke),win:e/ke<g/kg})}
+    setHero(false,'Compensa mais',ans,amber,sub,facts);
+  }
+  save();
+}
+const IDS=['pg','pe','dist','kml','kg','ke'];
+function save(){ls('cmb3',JSON.stringify(Object.fromEntries(IDS.map(i=>[i,$(i).value]))))}
+['pg','pe'].forEach(i=>$(i).addEventListener('input',()=>{ls('cmb3_at',String(Date.now()));calc()}));
+['dist','kml','kg','ke'].forEach(i=>$(i).addEventListener('input',calc));
+$('tabRent').onclick=()=>setMode('rent');$('tabDaily').onclick=()=>setMode('daily');
+try{const sv=JSON.parse(ls('cmb3')||'{}');IDS.forEach(i=>{if(sv[i]!==undefined&&sv[i]!=='')$(i).value=sv[i]})}catch(e){}
+setMode('daily');
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
